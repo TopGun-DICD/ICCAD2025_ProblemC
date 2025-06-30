@@ -1,0 +1,6 @@
+
+# msvs files
+build/msvs2022/x64
+build/msvs2022/.vs
+bin/*.pdb
+bin/*.exe
