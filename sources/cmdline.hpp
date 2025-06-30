@@ -4,6 +4,7 @@
 #include <vector>
 
 class CmdLine {
+public:
     std::string                 verilog,
                                 def;
     std::vector<std::string>    lefs,

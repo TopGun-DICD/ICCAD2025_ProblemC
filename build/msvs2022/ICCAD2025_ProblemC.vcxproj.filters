@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\verilog">
+      <UniqueIdentifier>{0e199b40-1f53-40d9-996b-6c03fbc1d056}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\verilog">
+      <UniqueIdentifier>{05904b6d-a687-4d16-bfac-2917ab92415d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sources\main.cpp">
@@ -21,10 +27,19 @@
     <ClCompile Include="..\..\sources\cmdline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sources\verilog\VerilogReader.cpp">
+      <Filter>Source Files\verilog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sources\cmdline.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\verilog\Verilog.hpp">
+      <Filter>Header Files\verilog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp">
+      <Filter>Header Files\verilog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <iostream>
 
-#define PROGRAM_VERSION "0.0.1"
+#define PROGRAM_VERSION "0.0.2"
 
 bool CmdLine::parse(int argc, char *argv[]) {
     if (1 == argc) {
@@ -31,20 +31,73 @@ bool CmdLine::parse(int argc, char *argv[]) {
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--verilog"))
             if (i == argc - 1) {
-                std::cerr << "__err__ : '--verilog' options should be followed by a valid path to a verilog file.        \nAbort.";
+                std::cerr << "__err__ : '--verilog' option should be followed by a valid path to a verilog file.        \nAbort.";
                 break;
             } else {
                 if(!findVerilog(argv[++i]))
                     return false;
                 continue;
             }
+        if (!strcmp(argv[i], "--def"))
+            if (i == argc - 1) {
+                std::cerr << "__err__ : '--def' option should be followed by a valid path to a DEF file.        \nAbort.";
+                break;
+            }
+            else {
+                if (!findDEF(argv[++i]))
+                    return false;
+                continue;
+            }
+        if (!strcmp(argv[i], "--design"))
+            if (i == argc - 1) {
+                std::cerr << "__err__ : '--design' option should be followed by a valid path to a design.        \nAbort.";
+                break;
+            }
+            else {
+                if (!findDesign(argv[++i]))
+                    return false;
+                continue;
+            }
+        if (!strcmp(argv[i], "--lefs"))
+            if (i == argc - 1) {
+                std::cerr << "__err__ : '--lefs' option should be followed by a valid path to LEF files.        \nAbort.";
+                break;
+            }
+            else {
+                if (!findLEFs(argv[++i]))
+                    return false;
+                continue;
+            }
+        if (!strcmp(argv[i], "--libs"))
+            if (i == argc - 1) {
+                std::cerr << "__err__ : '--libs' option should be followed by a valid path to Liberty files.        \nAbort.";
+                break;
+            }
+            else {
+                if (!findLEFs(argv[++i]))
+                    return false;
+                continue;
+            }
+        if (!strcmp(argv[i], "--asap7"))
+            if (i == argc - 1) {
+                std::cerr << "__err__ : '--asap7' option should be followed by a valid path to the ASAP7 PDK.        \nAbort.";
+                break;
+            }
+            else {
+                if (!findASAP7(argv[++i]))
+                    return false;
+                continue;
+            }
     }
 
-
+    // Perform elementary checks
+    if (verilog.empty() || def.empty() || lefs.empty() || libs.empty()) {
+        std::cerr << "__err__ : Some requred files are missing. Abort.\n\n";
+        return false;
+    }
 
     return true;
 }
-
 
 void CmdLine::printVersionString() {
     std::cout << "ICCAD 2025 TaskC solver [cadc1079 team] version " PROGRAM_VERSION << "\n\n";
@@ -66,8 +119,8 @@ void CmdLine::printHelpString() {
     std::cout << "                         with the same name as the design: <path>.v and <path>.def\n";
     std::cout << "\n";
     std::cout << "  To specify required files from ASAP7 PDK you may use one of these sets of args:\n";
-    std::cout << "    --lefpath <path>   - path to a folder with LEF files in it\n";
-    std::cout << "    --libpath <path>   - path to a folder with Liberty files in it\n";
+    std::cout << "    --lefs <path>      - path to a folder with LEF files in it\n";
+    std::cout << "    --libs <path>      - path to a folder with Liberty files in it\n";
     std::cout << "  or\n";
     std::cout << "    --asap7 <path>     - path to the ASAP7 folder with the same structure as in the given example\n";
 }

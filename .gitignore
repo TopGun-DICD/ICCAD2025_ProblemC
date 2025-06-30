@@ -4,3 +4,4 @@ build/msvs2022/x64
 build/msvs2022/.vs
 bin/*.pdb
 bin/*.exe
+bin/tests/ASAP7/LIB

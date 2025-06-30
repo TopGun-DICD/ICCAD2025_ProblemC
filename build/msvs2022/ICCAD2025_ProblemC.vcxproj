@@ -21,9 +21,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\sources\cmdline.cpp" />
     <ClCompile Include="..\..\sources\main.cpp" />
+    <ClCompile Include="..\..\sources\verilog\VerilogReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sources\cmdline.hpp" />
+    <ClInclude Include="..\..\sources\verilog\Verilog.hpp" />
+    <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
