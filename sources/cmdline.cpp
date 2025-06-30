@@ -4,6 +4,11 @@
 #include <iostream>
 
 #define PROGRAM_VERSION "0.0.2"
+#if defined _WIN32
+#   define DELIMETER "\\"
+#else
+#   define DELIMETER "/"
+#endif
 
 bool CmdLine::parse(int argc, char *argv[]) {
     if (1 == argc) {
@@ -192,12 +197,24 @@ bool CmdLine::findDesign(const char *_path) {
         return false;
     std::filesystem::path path(_path);
     if (!std::filesystem::exists(path)) {
-        std::cerr << "__err__ : Specified design folder '" << _path << "' doesn't exist!        \nAbort.";
+        std::cerr << "__err__ : Specified design path '" << _path << "' doesn't exist!        \nAbort.";
         return false;
     }
-    if (!findVerilog((std::string(_path) + std::string(".v")).c_str()))
+    std::string str(_path);
+    std::string verilogFileName;
+    std::string defFileName;
+    size_t pos = str.find_last_of(DELIMETER);
+    if (std::string::npos == pos) {
+        verilogFileName = str + DELIMETER + str + ".v";
+        defFileName = str + DELIMETER + str + ".def";
+    }
+    else {
+        verilogFileName = str + DELIMETER + str.substr(pos + 1) + ".v";
+        defFileName = str + DELIMETER + str.substr(pos + 1) + ".def";
+    }
+    if (!findVerilog(verilogFileName.c_str()))
         return false;
-    if (!findDEF((std::string(_path) + std::string(".def")).c_str()))
+    if (!findDEF(defFileName.c_str()))
         return false;
     return true;
 }
@@ -210,9 +227,11 @@ bool CmdLine::findASAP7(const char *_path) {
         std::cerr << "__err__ : Specified ASAP7 folder '" << _path << "' doesn't exist!        \nAbort.";
         return false;
     }
-    if (!findLibs((std::string(_path) + std::string("/LEF")).c_str()))
+    std::string lefPath = std::string(_path) + DELIMETER + std::string("LEF");
+    std::string libPath = std::string(_path) + DELIMETER + std::string("LIB");
+    if (!findLEFs(lefPath.c_str()))
         return false;
-    if (!findLibs((std::string(_path) + std::string("/LIB")).c_str()))
+    if (!findLibs(libPath.c_str()))
         return false;
     return true;
 }
