@@ -1,0 +1,22 @@
+#pragma once
+
+#include <string>
+#include <vector>
+
+class CmdLine {
+    std::string                 verilog,
+                                def;
+    std::vector<std::string>    lefs,
+                                libs;
+public:
+    bool parse(int argc, char *argv[]);
+private:
+    void printVersionString();
+    void printHelpString();
+    bool findVerilog(const char *path);
+    bool findDEF(const char *path);
+    bool findLEFs(const char *path);
+    bool findLibs(const char *path);
+    bool findDesign(const char *path);
+    bool findASAP7(const char *path);
+};
