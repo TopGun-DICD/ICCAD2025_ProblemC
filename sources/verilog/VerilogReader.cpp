@@ -16,6 +16,7 @@ VerilogReader::~VerilogReader() {
 }
 
 bool VerilogReader::read(const std::string &fname, Netlist &netlist) {
+    std::cout << "Reading input verilog file '" << fname << "'...\n";
     std::time_t timeStart = std::clock();
 
     if (!readHDLCode(fname))
@@ -28,7 +29,7 @@ bool VerilogReader::read(const std::string &fname, Netlist &netlist) {
             continue;
         switch (token[0]) {
             case '`':
-                std::cerr << "__err__ : unsupported statement '" << token << "'. Abort." << std::endl;
+                std::cerr << "  __err__ : unsupported statement '" << token << "'. Abort." << std::endl;
                 return false;
             case 'm':
                 if (!strcmp(token, "module")) {
@@ -36,10 +37,10 @@ bool VerilogReader::read(const std::string &fname, Netlist &netlist) {
                         return false;
                     break;
                 }
-                std::cerr << "__err__ : unsupported token '" << token << "'. Abort." << std::endl;
+                std::cerr << "  __err__ : unsupported token '" << token << "'. Abort." << std::endl;
                 return false;
             default:
-                std::cerr << "__err__ : unsupported token '" << token << "'. Abort." << std::endl;
+                std::cerr << "  __err__ : unsupported token '" << token << "'. Abort." << std::endl;
                 return false;
         }
     }
@@ -69,7 +70,7 @@ bool VerilogReader::read(const std::string &fname, Netlist &netlist) {
         }
     }
 
-    std::cout << "__inf__ : File '" << fname << "' has been read in " 
+    std::cout << "Done reading input file. File has been read in " 
               << timeValMin << " min(s) " << timeValSec << " sec(s) " << timeValMsec << " msec(s)" << std::endl;
 
     return true;
@@ -192,9 +193,9 @@ bool VerilogReader::readModule(Netlist &netlist) {
     readToken(token);
     if (token[0] != '(') {
         if (token[0] == ';')
-            std::cerr << "__wrn__ (" << line << ") : module with no ports was met: '" << module->name << "'" << std::endl;
+            std::cerr << "  __wrn__ (" << line << ") : module with no ports was met: '" << module->name << "'" << std::endl;
         else {
-            std::cerr << "__err__ (" << line << "): unexpected token in module '" << module->name << "' definition. Abort." << std::endl;
+            std::cerr << "  __err__ (" << line << "): unexpected token in module '" << module->name << "' definition. Abort." << std::endl;
             netlist.library.pop_back();
             delete module;
             return false;
@@ -257,12 +258,12 @@ bool VerilogReader::readModulePortsOfDirection(Module *module, PortDirection dir
                 break;
         }
         if (index == module->ports.size()) {
-            std::cerr << "__err__ (" << line << "): in module '" << module->name << "' direction given for an undeclared port '" 
+            std::cerr << "  __err__ (" << line << "): in module '" << module->name << "' direction given for an undeclared port '" 
                       << token << "'. Abort." << std::endl;
             return false;
         }
         if (module->ports[index]->direction != PortDirection::undefined)
-            std::cerr << "__wrn__ (" << line << "): in module '" << module->name << "' port '" << token << "' already has got its direction" 
+            std::cerr << "  __wrn__ (" << line << "): in module '" << module->name << "' port '" << token << "' already has got its direction" 
                       << std::endl;
         module->ports[index]->direction = dir;
     }
@@ -285,7 +286,7 @@ bool VerilogReader::readModuleNetsOfType(Module *module, NetType type) {
         }
         if (index != module->ports.size()) {
             if (module->ports[index]->type != NetType::undefined)
-                std::cerr << "__wrn__ (" << line << "): in module '" << module->name << "' port '" << token << "' already has git its type"
+                std::cerr << "  __wrn__ (" << line << "): in module '" << module->name << "' port '" << token << "' already has git its type"
                           << std::endl;
             module->ports[index]->type = type;
             continue;
@@ -298,7 +299,7 @@ bool VerilogReader::readModuleNetsOfType(Module *module, NetType type) {
             }
             if (index != module->nets.size()) {
                 if (module->nets[index]->type != NetType::undefined)
-                    std::cerr << "__wrn__ (" << line << "): in module '" << module->name << "' net '" << token << "' already has git its type"
+                    std::cerr << "  __wrn__ (" << line << "): in module '" << module->name << "' net '" << token << "' already has git its type"
                     << std::endl;
                 module->nets[index]->type = type;
                 continue;
@@ -329,7 +330,7 @@ bool VerilogReader::readModuleInstance(Netlist &netlist, Module *module, const c
 
     readToken(token);
     if (token[0] != '(') {
-        std::cerr << "__err__ (" << line << ") : syntax error in module instantiation, expected '(' but got '" 
+        std::cerr << "  __err__ (" << line << ") : syntax error in module instantiation, expected '(' but got '" 
                   << token <<"'. Abort." << std::endl;
         return false;
     }
@@ -393,7 +394,7 @@ bool VerilogReader::readModuleInstance(Netlist &netlist, Module *module, const c
                 if (module->ports[netIndex]->name == wires[i])
                     break;
             if (netIndex == module->ports.size()) {
-                std::cerr << "__err__ (" << line << ") : used net '" << wires[i] << "'wasn't found neither in nets nor ports of a module '" << module->name
+                std::cerr << "  __err__ (" << line << ") : used net '" << wires[i] << "'wasn't found neither in nets nor ports of a module '" << module->name
                     << "'. Abort." << std::endl;
                 return false;
             }
@@ -406,14 +407,14 @@ bool VerilogReader::readModuleInstance(Netlist &netlist, Module *module, const c
 }
 
 bool VerilogReader::performBasicChecks(Netlist &netlist) {
-    std::cout << "__inf__ : performing basic ckecks..." << std::endl;
+    std::cout << "Performing basic ckecks..." << std::endl;
     for (int i = 0; i < netlist.library.size(); ++i) {
         for(int j = 0; j < netlist.library[i]->instances.size(); ++j)
             if (!netlist.library[i]->instances[j]->instanceOf)
-                std::cerr << "__err__ : no base module found for instance " << netlist.library[i]->instances[j]->name 
+                std::cerr << "  __err__ : no base module found for instance " << netlist.library[i]->instances[j]->name 
                           << " in module " << netlist.library[i]->name;
     }
-    std::cout << "          Basic ckecks completed." << std::endl;
+    std::cout << "Basic ckecks completed." << std::endl;
     return true;
 }
 
@@ -428,9 +429,9 @@ bool VerilogReader::findTopModule(Netlist &netlist) {
         return true;
     }
 
-    std::cerr << "__wrn__ : There were found " << unusedCells.size() << " challenger cells to be TOP modules:" << std::endl;
+    std::cerr << "  __wrn__ : There were found " << unusedCells.size() << " challenger cells to be TOP modules:" << std::endl;
     for (auto *module : unusedCells)
         std::cerr << "          * " << module->name << std::endl;
-    std::cerr << "          I can't make a decision. Abort." << std::endl;
+    std::cerr << "            I can't make a decision. Abort." << std::endl;
     return false;
 }

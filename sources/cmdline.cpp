@@ -10,6 +10,11 @@
 #   define DELIMETER "/"
 #endif
 
+#define ENABLE_VERILOG_READING
+#define ENABLE_LEF_READING
+#define ENABLE_DEF_READING
+//#define ENABLE_LIB_READING
+
 bool CmdLine::parse(int argc, char *argv[]) {
     if (1 == argc) {
         std::cout << "ICCAD 2025 TaskC solver [cadc1079 team]\n\n";
@@ -96,8 +101,21 @@ bool CmdLine::parse(int argc, char *argv[]) {
     }
 
     // Perform elementary checks
-    if (verilog.empty() || def.empty() || lefs.empty() || libs.empty()) {
-        std::cerr << "__err__ : Some requred files are missing. Abort.\n\n";
+    if (
+#if defined ENABLE_VERILOG_READING        
+        verilog.empty() ||
+#endif
+#if defined ENABLE_DEF_READING
+        def.empty() ||
+#endif
+#if defined ENABLE_DEF_READING
+        lefs.empty() ||
+#endif
+#if defined ENABLE_LIBS_READING
+        libs.empty()
+#endif
+        false) {
+        std::cerr << "__err__ : Some reqiured files are missing. Abort.\n\n";
         return false;
     }
 
@@ -212,10 +230,14 @@ bool CmdLine::findDesign(const char *_path) {
         verilogFileName = str + DELIMETER + str.substr(pos + 1) + ".v";
         defFileName = str + DELIMETER + str.substr(pos + 1) + ".def";
     }
+#if defined ENABLE_VERILOG_READING
     if (!findVerilog(verilogFileName.c_str()))
         return false;
+#endif
+#if defined ENABLE_DEF_READING
     if (!findDEF(defFileName.c_str()))
         return false;
+#endif
     return true;
 }
 
@@ -229,10 +251,14 @@ bool CmdLine::findASAP7(const char *_path) {
     }
     std::string lefPath = std::string(_path) + DELIMETER + std::string("LEF");
     std::string libPath = std::string(_path) + DELIMETER + std::string("LIB");
+#if defined ENABLE_LEF_READING
     if (!findLEFs(lefPath.c_str()))
         return false;
+#endif
+#if defined ENABLE_LIB_READING
     if (!findLibs(libPath.c_str()))
         return false;
+#endif
     return true;
 }
 

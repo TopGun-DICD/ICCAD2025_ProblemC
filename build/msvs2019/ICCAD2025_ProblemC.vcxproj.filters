@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\sources\verilog\VerilogReader.cpp">
       <Filter>Source Files\verilog</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sources\verilog\Verilog.cpp">
+      <Filter>Source Files\verilog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sources\cmdline.hpp">

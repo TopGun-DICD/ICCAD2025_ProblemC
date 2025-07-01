@@ -28,7 +28,7 @@ struct Net {
 struct Port : public Net {
     PortDirection   direction   = PortDirection::undefined;
 public:
-    Port() { isPort = true; }
+    Port();
 };
 
 
@@ -45,17 +45,13 @@ struct Module {
     std::vector<Instance *> instances;
     uint32_t                numberOfMyInstances = 0;
 public:
-   ~Module() {
-       for (auto *net : nets)
-           delete net;
-       nets.clear();
-       for (auto *port : ports)
-           delete port;
-       ports.clear();
-       for (auto *instance : instances)
-           delete instance;
-       instances.clear();
-    }
+    ~Module();
+public:
+    Net*        getNetByName(const std::string &name);
+    Port*       getPortByName(const std::string &name);
+    Instance*   getInstanceByName(const std::string &name);
+    std::vector<Instance *>
+                getInstancesByType(const std::string &typeName);
 };
 
 struct Netlist {
@@ -63,10 +59,7 @@ struct Netlist {
     Module                 *top = nullptr;
     std::vector<Module *>   library;
 public:
-   ~Netlist() {
-       for (auto *module : library) {
-           delete module;
-       }
-       library.clear();
-   }
+    ~Netlist();
+public:
+    Module* getModuleByName(const std::string &);
 };

@@ -1,7 +1,15 @@
 
-# msvs files
+# msvs2019 files
+build/msvs2019/x64
+build/msvs2019/.vs
+
+# msvs2022 files
 build/msvs2022/x64
 build/msvs2022/.vs
+
+# binaries
 bin/*.pdb
 bin/*.exe
+
+# tests
 bin/tests/ASAP7/LIB
