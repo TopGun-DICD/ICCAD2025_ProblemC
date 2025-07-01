@@ -19,6 +19,12 @@
     <Filter Include="Source Files\verilog">
       <UniqueIdentifier>{05904b6d-a687-4d16-bfac-2917ab92415d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\lef">
+      <UniqueIdentifier>{d0a0fc8c-898d-446a-aba3-64b3241e94e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lef">
+      <UniqueIdentifier>{979babd6-c3a9-4e00-a2a9-a71d272cdccb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sources\main.cpp">
@@ -33,6 +39,12 @@
     <ClCompile Include="..\..\sources\verilog\Verilog.cpp">
       <Filter>Source Files\verilog</Filter>
     </ClCompile>
+    <ClCompile Include="LEF.cpp">
+      <Filter>Source Files\lef</Filter>
+    </ClCompile>
+    <ClCompile Include="LEF_READER.cpp">
+      <Filter>Source Files\lef</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sources\cmdline.hpp">
@@ -43,6 +55,12 @@
     </ClInclude>
     <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp">
       <Filter>Header Files\verilog</Filter>
+    </ClInclude>
+    <ClInclude Include="LEF.hpp">
+      <Filter>Header Files\lef</Filter>
+    </ClInclude>
+    <ClInclude Include="LEF_READER.hpp">
+      <Filter>Header Files\lef</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
