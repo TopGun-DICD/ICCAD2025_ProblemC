@@ -3,7 +3,6 @@
 #include "cmdline.hpp"
 #include "verilog/Verilog.hpp"
 #include "verilog/VerilogReader.hpp"
-#include "lef/LEF.hpp"
 
 
 int main(int argc, char *argv[]) {
@@ -15,8 +14,6 @@ int main(int argc, char *argv[]) {
     VerilogReader   verilogReader;
     if (!verilogReader.read(cmdLine.verilog, netlist))
         return EXIT_FAILURE;
-
-    LEF_READER lef_reader;
 
     return EXIT_SUCCESS;
 
