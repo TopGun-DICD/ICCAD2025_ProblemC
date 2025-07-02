@@ -3,6 +3,8 @@
 #include "cmdline.hpp"
 #include "verilog/Verilog.hpp"
 #include "verilog/VerilogReader.hpp"
+#include "lef/LEF.hpp"
+#include "lef/LEF_READER.hpp"
 
 
 int main(int argc, char *argv[]) {
