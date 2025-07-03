@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <stdexcept>
 #include <sstream> 
+#include <ctime>
 
 #include "LEF_READER.hpp"
 
@@ -9,7 +10,10 @@ LEF_READER::~LEF_READER() {
 }
 
 bool LEF_READER::read(const std::string& filename) {
+
     std::cout << "Reading input lef file '" << filename << "'...\n";
+    std::time_t timeStart = std::clock();
+
     std::ifstream file(filename);
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + filename);
@@ -44,6 +48,29 @@ bool LEF_READER::read(const std::string& filename) {
             }
         }
     }
+
+    std::time_t timeStop = std::clock() - timeStart;
+    std::time_t timeValMin = 0;
+    std::time_t timeValSec = 0;
+    std::time_t timeValMsec = timeStop;
+
+    if (timeStop < 1000) {
+        if (timeStop == 0)
+            timeValMsec = 1;
+    }
+    else {
+        if (timeStop > 1000) {
+            timeValSec = timeStop / 1000;
+            timeValMsec = timeStop - timeValSec * 1000;
+        }
+        if (timeValSec > 60) {
+            timeValMin = timeValSec / 60;
+            timeValSec = timeValSec - (timeValMin * 60);
+        }
+    }
+
+    std::cout << "Done reading input file. File has been read in "
+        << timeValMin << " min(s) " << timeValSec << " sec(s) " << timeValMsec << " msec(s)" << std::endl;
         file.close();
       
         return true;
@@ -228,10 +255,9 @@ Macro* LEF_READER::parseMacro(std::ifstream& file, const std::string& name) {
             macro->sizeY = safeStod(tokens[3]);
         }
         else if (tokens[0] == "SYMMETRY") {
-            for (size_t i = 1; i < tokens.size() - 1; ++i) {
+            for (size_t i = 1; i < tokens.size(); ++i) {
                 macro->symmetry += tokens[i];
             }
-
             hasXYSymmetry = (macro->symmetry == "XY");
         }
         else if (tokens[0] == "PIN") {
