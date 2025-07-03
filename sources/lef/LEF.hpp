@@ -11,17 +11,17 @@ struct Rect {
         : x1(_x1), y1(_y1), x2(_x2), y2(_y2) {}
 };
 
-struct Port {
+struct Port_lef {
     std::string          layer;
     std::vector<Rect>    rects;
 };
 
 struct Pin {
+    Port_lef            port;
     std::string     name;
     std::string     direction;
     std::string     use;
     std::string     shape;
-    Port            port;
 };
 
 struct Obs {

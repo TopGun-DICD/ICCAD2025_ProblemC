@@ -1,6 +1,7 @@
 #ifndef LEF_READER_HPP
 #define LEF_READER_HPP
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -23,11 +24,11 @@ private:
     static double safeStod(const std::string& str);
 
     Rect* parseRect(const std::vector<std::string>& tokens) const;
-    Port* parsePort(std::ifstream& file) const;
+    Port_lef* parsePort(std::ifstream& file) const;
     Pin* parsePin(std::ifstream& file, const std::string& pinName) const;
     Obs* parseObs(std::ifstream& file) const;
     Macro* parseMacro(std::ifstream& file, const std::string& name);
-    Site* parseSite(std::ifstream& file, const std::string& name);
+    Site* parseSite(std::ifstream& file, const std::string& name, const std::vector<Site*>& existingSite);
 
     void clear();
 };

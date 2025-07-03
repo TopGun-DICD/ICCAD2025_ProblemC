@@ -9,6 +9,7 @@ LEF_READER::~LEF_READER() {
 }
 
 bool LEF_READER::read(const std::string& filename) {
+    std::cout << "Reading input lef file '" << filename << "'...\n";
     std::ifstream file(filename);
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + filename);
@@ -17,27 +18,36 @@ bool LEF_READER::read(const std::string& filename) {
     std::string line;
     while (getline(file, line)) {
         line = trim(line);
-        if (line.empty() || line[0] == '#') continue;
 
-        if (line.rfind("MACRO", 0) == 0) {
+        if (line[0] == '#' || line.find("VERSION") == 0 ||
+            line.find("BUSBITCHARS") == 0 || line.find("DIVIDERCHAR") == 0) {
+            continue;
+        }
+
+        if (line.find("SITE") == 0) {
+            auto tokens = tokenize(line);
+            if (tokens.size() >= 2) {
+                Site* site = parseSite(file, tokens[1], sites);
+                if (site) {
+                    sites.push_back(site);
+                }
+            }
+        }
+
+        else if (line.find("MACRO") == 0) {
             auto tokens = tokenize(line);
             if (tokens.size() >= 2) {
                 Macro* macro = parseMacro(file, tokens[1]);
-                if (macro) macros.push_back(macro);
-            }
-
-        }
-        else if (line.rfind("SITE", 0) == 0) {
-            auto tokens = tokenize(line);
-            if (tokens.size() >= 2) {
-                Site* site = parseSite(file, tokens[1]);
-                if (site) sites.push_back(site);
+                if (macro) {
+                    macros.push_back(macro);
+                }
             }
         }
+    }
         file.close();
+      
         return true;
     }
-}
 
 Macro* LEF_READER::getMacroByName(const std::string& name) const {
     for (auto macro : macros) {
@@ -62,9 +72,9 @@ void LEF_READER::exportToFile(const std::string& filename) const {
 }
 
 std::string LEF_READER::trim(const std::string& str) {
-    size_t first = str.find_first_not_of(" \t");
+    size_t first = str.find_first_not_of(" \t;");
     if (first == std::string::npos) return "";
-    size_t last = str.find_last_not_of(" \t");
+    size_t last = str.find_last_not_of(" \t;");
     return str.substr(first, last - first + 1);
 }
 
@@ -89,16 +99,19 @@ double LEF_READER::safeStod(const std::string& str) {
 
 Rect* LEF_READER::parseRect(const std::vector<std::string>& tokens) const {
     if (tokens.size() < 5) return nullptr;
-    return new Rect{
+    Rect* rect = new Rect{
         safeStod(tokens[1]),
         safeStod(tokens[2]),
         safeStod(tokens[3]),
         safeStod(tokens[4])
+                  
     };
+   
+    return rect;
 }
 
-Port* LEF_READER::parsePort(std::ifstream& file) const {
-    Port* port = new Port();
+Port_lef* LEF_READER::parsePort(std::ifstream& file) const {
+    Port_lef* port = new Port_lef();
     std::string line;
 
     while (getline(file, line)) {
@@ -145,7 +158,7 @@ Pin* LEF_READER::parsePin(std::ifstream& file, const std::string& name) const {
             pin->shape = tokens[1];
         }
         else if (tokens[0] == "PORT") {
-            Port* port = parsePort(file);
+            Port_lef* port = parsePort(file);
             pin->port = *port;
             delete port;
         }
@@ -195,6 +208,7 @@ Macro* LEF_READER::parseMacro(std::ifstream& file, const std::string& name) {
     Macro* macro = new Macro();
     macro->name = name;
     std::string line;
+    bool hasXYSymmetry = false;
 
     while (getline(file, line)) {
         line = trim(line);
@@ -213,6 +227,13 @@ Macro* LEF_READER::parseMacro(std::ifstream& file, const std::string& name) {
             macro->sizeX = safeStod(tokens[1]);
             macro->sizeY = safeStod(tokens[3]);
         }
+        else if (tokens[0] == "SYMMETRY") {
+            for (size_t i = 1; i < tokens.size() - 1; ++i) {
+                macro->symmetry += tokens[i];
+            }
+
+            hasXYSymmetry = (macro->symmetry == "XY");
+        }
         else if (tokens[0] == "PIN") {
             Pin* pin = parsePin(file, tokens[1]);
             macro->pins.push_back(*pin);
@@ -227,10 +248,34 @@ Macro* LEF_READER::parseMacro(std::ifstream& file, const std::string& name) {
             break;
         }
     }
+
+    if (!hasXYSymmetry) {
+        std::cout << "Macro '" << macro->name << "' has non-XY symmetry: " << macro->symmetry << std::endl;
+    }
+
     return macro;
 }
 
-Site* LEF_READER::parseSite(std::ifstream& file, const std::string& name) {
+Site* LEF_READER::parseSite(std::ifstream& file, const std::string& name, const std::vector<Site*>& existingSites) {
+
+    for (const auto& site : existingSites) {
+        if (site->name == name) {
+            std::string line;
+            while (getline(file, line)) {
+                line = trim(line);
+                if (line.empty()) continue;
+
+                std::vector<std::string> tokens = tokenize(line);
+                if (tokens.empty()) continue;
+
+                if (tokens[0] == "END" && tokens.size() > 1 && tokens[1] == name) {
+                    break;
+                }
+            }
+            return nullptr;
+        }
+    }
+
     Site* site = new Site();
     site->name = name;
     std::string line;

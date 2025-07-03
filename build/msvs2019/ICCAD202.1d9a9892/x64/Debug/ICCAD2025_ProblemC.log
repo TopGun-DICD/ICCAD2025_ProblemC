@@ -1,5 +1,4 @@
-﻿  main.cpp
-  LEF_READER.cpp
-C:\Users\user\Desktop\GITHUB\ICCAD2025_ProblemC\sources\main.cpp(6,10): error C1083: Не удается открыть файл включение: lef/LEF.hpp: No such file or directory,
+﻿  LEF_READER.cpp
+  main.cpp
   Создание кода...
-C:\Users\user\Desktop\GITHUB\ICCAD2025_ProblemC\build\msvs2019\LEF_READER.cpp(40,1): warning C4715: LEF_READER::read: значение возвращается не при всех путях выполнения
+  ICCAD2025_ProblemC.vcxproj -> C:\Users\user\Desktop\GITHUB\ICCAD2025_ProblemC\bin\ICCAD2025_ProblemC.exe
