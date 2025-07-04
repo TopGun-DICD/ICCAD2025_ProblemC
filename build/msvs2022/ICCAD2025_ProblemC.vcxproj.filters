@@ -33,10 +33,10 @@
     <ClCompile Include="..\..\sources\verilog\Verilog.cpp">
       <Filter>Source Files\verilog</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Desktop\Читалка\LEF_DEF\DEFReader.cpp">
+    <ClCompile Include="..\..\sources\DEFWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sources\DEFWriter.cpp">
+    <ClCompile Include="..\..\sources\DEFReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,13 +50,13 @@
     <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp">
       <Filter>Header Files\verilog</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Desktop\Читалка\LEF_DEF\DEFReader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\sources\NoBoostSplit.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sources\DEFWriter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\DEFReader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
