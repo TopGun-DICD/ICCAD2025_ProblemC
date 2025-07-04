@@ -391,17 +391,21 @@ void parsPROPERTYDEFINITIONS(ifstream* inFile, DEF_File* def, int* i) {
 
     while (getline(*inFile, buffer)) {
         *i = *i + 1;
+        
         if (!buffer.empty()) {
             my_boost::trim(buffer);
             my_boost::split(split_buffer, buffer, my_boost::is_any_of<char>(" "), true);
+            if (buffer == "END PROPERTYDEFINITIONS") {
+                //cout << "END VIAS " << *i << endl;         
+                return;
+            }
+                 //   def->PRO.push_back(buffer);
+        
         }
-        if (buffer == "END PROPERTYDEFINITIONS") {
-            //cout << "END VIAS " << *i << endl;         
-            return;
-        }
-        // def->PRO.push_back(buffer);
+        
+       
         def->beginning.push_back(buffer);
-        // def->PRO.push_back(buffer);
+        
 
         split_buffer.clear();
     }
