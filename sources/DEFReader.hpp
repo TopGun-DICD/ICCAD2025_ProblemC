@@ -15,6 +15,8 @@
 #include <locale>
 using namespace std;
 // Ориентация компонента
+
+
 enum Orientation {
     N,    // 0°
     S,    // 180°
@@ -158,13 +160,17 @@ class SPECIALNETS_class {
 
 class DEF_File {
 public:
-    char* BUSBITCHARS = new char[2]; // Разделяющие символы для шинных битов(нужно уточнить их 2 или 3) gпо умолчанию []
+    int Flag_per_tz = 0;
+    char BUSBITCHARS[2]; // Разделяющие символы для шинных битов(нужно уточнить их 2 или 3) gпо умолчанию []
     float version;
     char DIVIDERCHAR = '/';  //символ разделитель по умолчанию /
     string DESIGN;
+    //vector<string> PRO;
+
     int UNITS_DISTANCE_MICRONS;
     Rect DIEAREA;
     vector<string> beginning;// мусор в начале, не парсим
+
     int COUNT_COMPONENTS = 0;
     vector<COMPONENTS_clas> COMPONENTS;
     int numBlockages;
@@ -203,7 +209,7 @@ public:
         SPECIALNETS.push_back(buffer_nets);
     }
 };
-
+void parsPROPERTYDEFINITIONS(ifstream* inFile, DEF_File* def, int* i);
 void parsComponents(ifstream* inFile, DEF_File* def, int* i);
 void parsNets(ifstream* inFile, DEF_File* def, int* i);
 void parsSpecialnets(ifstream* inFile, DEF_File* def, int* i);

@@ -2,81 +2,86 @@
 #ifndef DEF_PARSER_CPP
 #define DEF_PARSER_CPP
 #include "DEFReader.hpp"
-#include "./LEF_DEF/NoBoostSplit.hpp"
+#include "NoBoostSplit.hpp"
 
 void parsComponents(ifstream* inFile, DEF_File* def, int* i) {
     string buffer;
     vector<string> split_buffer;
-    // cout << "START COMPONENTS " << *i << endl;
+
+    //cout << "START COMPONENTS " << *i << endl;
 
     while (getline(*inFile, buffer)) {
         *i = *i + 1;
-        my_boost::trim(buffer);
-        my_boost::split(split_buffer, buffer, my_boost::is_any_of<char>(" "), true);
-        if (buffer == "END COMPONENTS") {
-            // cout << "END COMPONENTS " << *i << endl;          
-            return;
+
+        if ((!buffer.empty()) && (buffer.size() > 3)) {
+
+            my_boost::trim(buffer);
+            my_boost::split(split_buffer, buffer, my_boost::is_any_of<char>(" "), true);
+            if (buffer == "END COMPONENTS") {
+                // cout << "END COMPONENTS " << *i << endl;          
+                return;
+            }
+
+            def->push_back_COMPONENTS(split_buffer[1], split_buffer[2]);
+
+            for (const auto& word : split_buffer) {
+                if (word == "PLACED") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].FIXED = PLACED;
+                }
+                if (word == "COVER") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].FIXED = COVER;
+                }
+                if (word == "UNPLACED") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].FIXED = UNPLACED;
+                }
+                if (word == "FIXED") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].FIXED = FIXED;
+                }
+                if (word == "NETLIST") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].SOURCE = NETLIST;
+                }
+                if (word == "USER") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].SOURCE = USER;
+                }
+                if (word == "DIST") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].SOURCE = DIST;
+                }
+                if (word == "TIMING") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].SOURCE = TIMING;
+                }
+                if (word == "(") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].POS.x = stoi(*(&word + 1));
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].POS.y = stoi(*(&word + 2));
+                    //  ;
+                }
+                if (word == "N") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = N;
+                }
+                if (word == "S") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = S;
+                }
+                if (word == "E") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = E;
+                }
+                if (word == "W") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = W;
+                }
+                if (word == "FN") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = FN;
+                }
+                if (word == "FS") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = FS;
+                }
+                if (word == "FE") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = FE;
+                }
+                if (word == "FW") {
+                    def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = FW;
+                }
+
+
+            }
         }
-
-        def->push_back_COMPONENTS(split_buffer[1], split_buffer[2]);
-        for (const auto& word : split_buffer) {
-            if (word == "PLACED") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].FIXED = PLACED;
-            }
-            if (word == "COVER") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].FIXED = COVER;
-            }
-            if (word == "UNPLACED") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].FIXED = UNPLACED;
-            }
-            if (word == "FIXED") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].FIXED = FIXED;
-            }
-            if (word == "NETLIST") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].SOURCE = NETLIST;
-            }
-            if (word == "USER") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].SOURCE = USER;
-            }
-            if (word == "DIST") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].SOURCE = DIST;
-            }
-            if (word == "TIMING") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].SOURCE = TIMING;
-            }
-            if (word == "(") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].POS.x = stoi(*(&word + 1));
-                def->COMPONENTS[def->COMPONENTS.size() - 1].POS.y = stoi(*(&word + 2));
-                //  ;
-            }
-            if (word == "N") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = N;
-            }
-            if (word == "S") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = S;
-            }
-            if (word == "E") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = E;
-            }
-            if (word == "W") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = W;
-            }
-            if (word == "FN") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = FN;
-            }
-            if (word == "FS") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = FS;
-            }
-            if (word == "FE") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = FE;
-            }
-            if (word == "FW") {
-                def->COMPONENTS[def->COMPONENTS.size() - 1].POS.orientation = FW;
-            }
-
-
-        }
-
         split_buffer.clear();
     }
 }
@@ -99,7 +104,7 @@ void parsNets(ifstream* inFile, DEF_File* def, int* i) {
                 }
                 if (word == "USE") {
                     if (*(&word + 1) == "SIGNAL") {
-                        def->NETS[def->NETS.size()-1].USE = SIGNAL;
+                        def->NETS[def->NETS.size() - 1].USE = SIGNAL;
                     }
                     if (*(&word + 1) == "POWER") {
                         def->NETS[def->NETS.size() - 1].USE = POWER;
@@ -123,11 +128,11 @@ void parsNets(ifstream* inFile, DEF_File* def, int* i) {
                         def->NETS[def->NETS.size() - 1].USE = RESET;
                     }
                 }
-            
+
             }
         }
         if (split_buffer[0] == "(") {
-        
+
             for (const auto& word : split_buffer) {
                 if (word == "(") {
                     def->push_back_NETS_rect_u((*(&word + 1)), (*(&word + 2)));
@@ -258,7 +263,7 @@ void parsPins(ifstream* inFile, DEF_File* def, int* i) {
     string buffer;
     string buffer_end;
     vector<string> split_buffer;
-   // cout << "START PINS " << *i << endl;
+    // cout << "START PINS " << *i << endl;
 
     while (getline(*inFile, buffer)) {
         *i = *i + 1;
@@ -327,7 +332,7 @@ void parsPins(ifstream* inFile, DEF_File* def, int* i) {
                 def->PINS[def->PINS.size() - 1].LAYER[def->PINS[def->PINS.size() - 1].LAYER.size() - 1].rect.y2 = stoi(*(&word + 8));
 
             }
-            
+
             if (word == "PLACED") {
                 def->PINS[def->PINS.size() - 1].PLACED_PIN = PLACED;
                 def->PINS[def->PINS.size() - 1].POS.x = stoi(*(&word + 2));
@@ -348,8 +353,8 @@ void parsPins(ifstream* inFile, DEF_File* def, int* i) {
                 def->PINS[def->PINS.size() - 1].POS.x = stoi(*(&word + 2));
                 def->PINS[def->PINS.size() - 1].POS.y = stoi(*(&word + 3));
             }
-            if (word == "N") {                      
-              def->PINS[def->PINS.size() - 1].POS.orientation = N;
+            if (word == "N") {
+                def->PINS[def->PINS.size() - 1].POS.orientation = N;
             }
             if (word == "S") {
                 def->PINS[def->PINS.size() - 1].POS.orientation = S;
@@ -379,6 +384,30 @@ void parsPins(ifstream* inFile, DEF_File* def, int* i) {
     }
 
 }
+void parsPROPERTYDEFINITIONS(ifstream* inFile, DEF_File* def, int* i) {
+    string buffer;
+    vector<string> split_buffer;
+    // cout << "START VIAS " << *i << endl;
+
+    while (getline(*inFile, buffer)) {
+        *i = *i + 1;
+        if (!buffer.empty()) {
+            my_boost::trim(buffer);
+            my_boost::split(split_buffer, buffer, my_boost::is_any_of<char>(" "), true);
+        }
+        if (buffer == "END PROPERTYDEFINITIONS") {
+            //cout << "END VIAS " << *i << endl;         
+            return;
+        }
+        // def->PRO.push_back(buffer);
+        def->beginning.push_back(buffer);
+        // def->PRO.push_back(buffer);
+
+        split_buffer.clear();
+    }
+
+
+}
 void parsVias(ifstream* inFile, DEF_File* def, int* i) {
     string buffer;
     vector<string> split_buffer;
@@ -386,8 +415,10 @@ void parsVias(ifstream* inFile, DEF_File* def, int* i) {
 
     while (getline(*inFile, buffer)) {
         *i = *i + 1;
-        my_boost::trim(buffer);
-        my_boost::split(split_buffer, buffer, my_boost::is_any_of<char>(" "), true);
+        if (!buffer.empty()) {
+            my_boost::trim(buffer);
+            my_boost::split(split_buffer, buffer, my_boost::is_any_of<char>(" "), true);
+        }
         if (buffer == "END VIAS") {
             //cout << "END VIAS " << *i << endl;         
             return;
@@ -406,20 +437,20 @@ Position return_component_pos(DEF_File* def, string name) {
     }
 }
 
-void swup_comp( DEF_File* def, string name1, string name2) {
+void swup_comp(DEF_File* def, string name1, string name2) {
     COMPONENTS_clas buf;
     int adr = 0;
     for (int o = 0; o < def->COMPONENTS.size(); o++) {
-         if (def->COMPONENTS[o].compName == name1) {
-                buf.compName = def->COMPONENTS[o].compName;
-                buf.FIXED = def->COMPONENTS[o].FIXED;
-                buf.modelName = def->COMPONENTS[o].modelName;
-                buf.POS.x = def->COMPONENTS[o].POS.x;
-                buf.POS.y = def->COMPONENTS[o].POS.y;
-                buf.POS.orientation = def->COMPONENTS[o].POS.orientation;
-                buf.SOURCE = def->COMPONENTS[o].SOURCE;
-                adr = o;
-         }      
+        if (def->COMPONENTS[o].compName == name1) {
+            buf.compName = def->COMPONENTS[o].compName;
+            buf.FIXED = def->COMPONENTS[o].FIXED;
+            buf.modelName = def->COMPONENTS[o].modelName;
+            buf.POS.x = def->COMPONENTS[o].POS.x;
+            buf.POS.y = def->COMPONENTS[o].POS.y;
+            buf.POS.orientation = def->COMPONENTS[o].POS.orientation;
+            buf.SOURCE = def->COMPONENTS[o].SOURCE;
+            adr = o;
+        }
     }
     for (int o = 0; o < def->COMPONENTS.size(); o++) {
         if ((def->COMPONENTS[o].compName == name2) && (def->COMPONENTS[o].modelName == def->COMPONENTS[adr].modelName)) {
@@ -454,77 +485,104 @@ void ReadDEF(DEF_File* def, string nameInFile) {
     int i = 0;
 
     while (getline(inFile, buffer)) {
-        my_boost::trim(buffer);
-        my_boost::split(split_buffer, buffer, my_boost::is_any_of<char>(" "), true);
-
         i++;
-        if (buffer == "END DESIGN") {
-            break;
+        if (!buffer.empty()) {
+
+            my_boost::trim(buffer);
+            my_boost::split(split_buffer, buffer, my_boost::is_any_of<char>(" "), true);
+
+
+
+                if (buffer == "END DESIGN") {
+                    break;
+            }
+
+            if (split_buffer.front() == "VERSION") {
+                def->version = stof(split_buffer[1]);
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "DIVIDERCHAR") {
+                BUS_DIV = split_buffer[1];
+                def->DIVIDERCHAR = BUS_DIV[1];
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "BUSBITCHARS") {
+                BUS_DIV = split_buffer[1];
+                def->BUSBITCHARS[0] = BUS_DIV[1];
+                def->BUSBITCHARS[1] = BUS_DIV[2];
+
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "PROPERTYDEFINITIONS") {
+                parsPROPERTYDEFINITIONS(&inFile, def, &i);
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "DESIGN") {
+                def->DESIGN = split_buffer[1];
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "COMPONENTS") {
+                def->COUNT_COMPONENTS = stoi(split_buffer[1]);
+                parsComponents(&inFile, def, &i);
+
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "VIAS") {
+                def->COUNT_VIAS = stoi(split_buffer[1]);
+                parsVias(&inFile, def, &i);
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "PINS") {
+                def->COUNT_PINS = stoi(split_buffer[1]);
+                parsPins(&inFile, def, &i);
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "NETS") {
+                def->COUNT_NETS = stoi(split_buffer[1]);
+                parsNets(&inFile, def, &i);
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "SPECIALNETS") {
+                def->COUNT_SPECIALNETS = stoi(split_buffer[1]);
+                parsSpecialnets(&inFile, def, &i);
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "UNITS") {
+                def->UNITS_DISTANCE_MICRONS = stoi(split_buffer[3]);
+                flagPaternov = 1;
+            }
+            if (split_buffer.front() == "DIEAREA") {
+                def->DIEAREA.x1 = stoi(split_buffer[2]);
+                def->DIEAREA.y1 = stoi(split_buffer[3]);
+                def->DIEAREA.x2 = stoi(split_buffer[6]);
+                def->DIEAREA.y2 = stoi(split_buffer[7]);
+                flagPaternov = 1;
+            }
+
+            string ifter;
+            if (!buffer.empty()) {
+                ifter = split_buffer[0];
+            }
+
+            if ((flagPaternov == 0) && (split_buffer[0] != "#")) {
+
+                if (!buffer.empty()) {
+                    def->beginning.push_back(buffer);
+                }
+
+                //cout <<"error" ;
+            }
+
+
+
+            // if (i>1000) break;
+            split_buffer.clear();
+            flagPaternov = 0;
+
         }
-        if (split_buffer.front() == "VERSION") {
-            def->version = stof(split_buffer[1]);
-            flagPaternov = 1;
-        }
-        if (split_buffer.front() == "DIVIDERCHAR") {
-            BUS_DIV = split_buffer[1];
-            def->DIVIDERCHAR = BUS_DIV[1];
-            flagPaternov = 1;
-        }
-        if (split_buffer.front() == "BUSBITCHARS") {
-            BUS_DIV = split_buffer[1];
-            def->BUSBITCHARS[0] = BUS_DIV[1];
-            def->BUSBITCHARS[1] = BUS_DIV[2];
-            flagPaternov = 1;
-        }
-        if (split_buffer.front() == "DESIGN") {
-            def->DESIGN = split_buffer[1];
-            flagPaternov = 1;
-        }
-        if (split_buffer.front() == "COMPONENTS") {
-            def->COUNT_COMPONENTS = stoi(split_buffer[1]);
-            parsComponents(&inFile, def, &i);
-            flagPaternov = 1;
-        }
-        if (split_buffer.front() == "VIAS") {
-            def->COUNT_VIAS = stoi(split_buffer[1]);
-            parsVias(&inFile, def, &i);
-            flagPaternov = 1;
-        }
-        if (split_buffer.front() == "PINS") {
-            def->COUNT_PINS = stoi(split_buffer[1]);
-            parsPins(&inFile, def, &i);
-            flagPaternov = 1;
-        }
-        if (split_buffer.front() == "NETS") {
-            def->COUNT_NETS = stoi(split_buffer[1]);
-            parsNets(&inFile, def, &i);
-            flagPaternov = 1;
-        }
-        if (split_buffer.front() == "SPECIALNETS") {
-            def->COUNT_SPECIALNETS = stoi(split_buffer[1]);
-            parsSpecialnets(&inFile, def, &i);
-            flagPaternov = 1;
-        }
-        if (split_buffer.front() == "UNITS") {
-            def->UNITS_DISTANCE_MICRONS = stoi(split_buffer[3]);
-            flagPaternov = 1;
-        }
-        if (split_buffer.front() == "DIEAREA") {
-            def->DIEAREA.x1 = stoi(split_buffer[2]);
-            def->DIEAREA.y1 = stoi(split_buffer[3]);
-            def->DIEAREA.x2 = stoi(split_buffer[6]);
-            def->DIEAREA.y2 = stoi(split_buffer[7]);
-            flagPaternov = 1;
-        }
-        if (flagPaternov == 0) {
-            def->beginning.push_back(buffer);
-        }
-        // if (i>1000) break;
-        split_buffer.clear();
-        flagPaternov = 0;
     }
     inFile.close();
-    
+
 }
 
 
