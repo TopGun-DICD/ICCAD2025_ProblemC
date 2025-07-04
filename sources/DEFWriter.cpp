@@ -61,6 +61,7 @@ void OutDEF(DEF_File* def, string nameOutFile) {
 
 
     for (int i = 0; i < (def->beginning.size()); i++) {
+      //  def->PRO[i] = " o";
         outFile <<def->beginning[i] << endl;
     }
 
