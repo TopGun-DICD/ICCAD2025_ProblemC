@@ -19,12 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\Desktop\Читалка\LEF_DEF\DEFReader.cpp" />
     <ClCompile Include="..\..\sources\cmdline.cpp" />
+    <ClCompile Include="..\..\sources\DEFWriter.cpp" />
     <ClCompile Include="..\..\sources\main.cpp" />
+    <ClCompile Include="..\..\sources\verilog\Verilog.cpp" />
     <ClCompile Include="..\..\sources\verilog\VerilogReader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\Desktop\Читалка\LEF_DEF\DEFReader.hpp" />
     <ClInclude Include="..\..\sources\cmdline.hpp" />
+    <ClInclude Include="..\..\sources\DEFWriter.hpp" />
+    <ClInclude Include="..\..\sources\NoBoostSplit.hpp" />
     <ClInclude Include="..\..\sources\verilog\Verilog.hpp" />
     <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp" />
   </ItemGroup>

@@ -1,4 +1,5 @@
-#include <iostream>
+#include "DEFReader.hpp"
+#include "DEFWriter.hpp"
 
 #include "cmdline.hpp"
 #include "verilog/Verilog.hpp"
@@ -9,10 +10,10 @@ int main(int argc, char *argv[]) {
     if (!cmdLine.parse(argc, argv))
         return EXIT_FAILURE;
 
-    Netlist         netlist;
-    VerilogReader   verilogReader;
-    if (!verilogReader.read(cmdLine.verilog, netlist))
-        return EXIT_FAILURE;
-
-    return EXIT_SUCCESS;
+   
+    DEF_File* def;
+    def = new DEF_File;
+    ReadDEF(def, cmdLine.def);
+    OutDEF(def,"C:\\out.def");
+   // return EXIT_SUCCESS;
 }
