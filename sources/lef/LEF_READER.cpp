@@ -5,13 +5,12 @@
 
 #include "LEF_READER.hpp"
 
-LEF_READER::~LEF_READER() {
-    clear();
+lef::LEF_READER::~LEF_READER() {
 }
 
-bool LEF_READER::read(const std::string& filename) {
+bool lef::LEF_READER::read(const std::string& filename, LEFData &lefs) {
 
-    std::cout << "Reading input lef file '" << filename << "'...\n";
+    std::cout << "Reading input LEF file '" << filename << "'...\n";
     std::time_t timeStart = std::clock();
 
     std::ifstream file(filename);
@@ -31,20 +30,14 @@ bool LEF_READER::read(const std::string& filename) {
         if (line.find("SITE") == 0) {
             auto tokens = tokenize(line);
             if (tokens.size() >= 2) {
-                Site* site = parseSite(file, tokens[1], sites);
-                if (site) {
-                    sites.push_back(site);
-                }
+                parseSite(file, tokens[1], lefs);
             }
         }
 
         else if (line.find("MACRO") == 0) {
             auto tokens = tokenize(line);
             if (tokens.size() >= 2) {
-                Macro* macro = parseMacro(file, tokens[1]);
-                if (macro) {
-                    macros.push_back(macro);
-                }
+                parseMacro(file, tokens[1], lefs);
             }
         }
     }
@@ -69,14 +62,15 @@ bool LEF_READER::read(const std::string& filename) {
         }
     }
 
-    std::cout << "Done reading input file. File has been read in "
+    std::cout << "Done reading input LEF file. File has been read in "
         << timeValMin << " min(s) " << timeValSec << " sec(s) " << timeValMsec << " msec(s)" << std::endl;
         file.close();
       
         return true;
     }
 
-Macro* LEF_READER::getMacroByName(const std::string& name) const {
+/*
+lef::Macro* lef::LEF_READER::getMacroByName(const std::string& name) const {
     for (auto macro : macros) {
         if (macro->name == name) {
             return macro;
@@ -84,8 +78,10 @@ Macro* LEF_READER::getMacroByName(const std::string& name) const {
     }
     return nullptr;
 }
+*/
 
-void LEF_READER::exportToFile(const std::string& filename) const {
+/*
+void lef::LEF_READER::exportToFile(const std::string& filename) const {
     std::ofstream out(filename);
     if (!out.is_open()) {
         throw std::runtime_error("Could not create file: " + filename);
@@ -97,15 +93,16 @@ void LEF_READER::exportToFile(const std::string& filename) const {
     }
     out.close();
 }
+*/
 
-std::string LEF_READER::trim(const std::string& str) {
+std::string lef::LEF_READER::trim(const std::string& str) {
     size_t first = str.find_first_not_of(" \t;");
     if (first == std::string::npos) return "";
     size_t last = str.find_last_not_of(" \t;");
     return str.substr(first, last - first + 1);
 }
 
-std::vector<std::string> LEF_READER::tokenize(const std::string& line) {
+std::vector<std::string> lef::LEF_READER::tokenize(const std::string& line) {
     std::vector<std::string> tokens;
     std::istringstream iss(line);
     std::string token;
@@ -115,7 +112,7 @@ std::vector<std::string> LEF_READER::tokenize(const std::string& line) {
     return tokens;
 }
 
-double LEF_READER::safeStod(const std::string& str) {
+double lef::LEF_READER::safeStod(const std::string& str) {
     try {
         return std::stod(str);
     }
@@ -124,21 +121,19 @@ double LEF_READER::safeStod(const std::string& str) {
     }
 }
 
-Rect* LEF_READER::parseRect(const std::vector<std::string>& tokens) const {
-    if (tokens.size() < 5) return nullptr;
-    Rect* rect = new Rect{
+void lef::LEF_READER::parseRect(const std::vector<std::string>& tokens, std::vector<Rect>& rects) const {
+    if (tokens.size() < 5) return;
+    rects.push_back(Rect{
         safeStod(tokens[1]),
         safeStod(tokens[2]),
         safeStod(tokens[3]),
         safeStod(tokens[4])
-                  
-    };
-   
-    return rect;
+        }
+    );
 }
 
-Port_lef* LEF_READER::parsePort(std::ifstream& file) const {
-    Port_lef* port = new Port_lef();
+lef::Port* lef::LEF_READER::parsePort(std::ifstream& file) const {
+    Port* port = new Port;
     std::string line;
 
     while (getline(file, line)) {
@@ -152,9 +147,7 @@ Port_lef* LEF_READER::parsePort(std::ifstream& file) const {
             port->layer = tokens[1];
         }
         else if (tokens[0] == "RECT") {
-            Rect* rect = parseRect(tokens);
-            port->rects.push_back(*rect);
-            delete rect;
+            parseRect(tokens, port->rects);
         }
         else if (tokens[0] == "END") {
             break;
@@ -163,7 +156,7 @@ Port_lef* LEF_READER::parsePort(std::ifstream& file) const {
     return port;
 }
 
-Pin* LEF_READER::parsePin(std::ifstream& file, const std::string& name) const {
+void lef::LEF_READER::parsePin(std::ifstream& file, const std::string& name, Macro *macro) const {
     Pin* pin = new Pin();
     pin->name = name;
     std::string line;
@@ -185,7 +178,7 @@ Pin* LEF_READER::parsePin(std::ifstream& file, const std::string& name) const {
             pin->shape = tokens[1];
         }
         else if (tokens[0] == "PORT") {
-            Port_lef* port = parsePort(file);
+            Port* port = parsePort(file);
             pin->port = *port;
             delete port;
         }
@@ -193,11 +186,10 @@ Pin* LEF_READER::parsePin(std::ifstream& file, const std::string& name) const {
             break;
         }
     }
-    return pin;
+    macro->pins.push_back(pin);
 }
 
-Obs* LEF_READER::parseObs(std::ifstream& file) const {
-    Obs* obs = new Obs();
+void lef::LEF_READER::parseObs(std::ifstream& file, Macro *macro) const {
     std::string currentLayer;
     std::vector<Rect> currentRects;
     std::string line;
@@ -211,27 +203,24 @@ Obs* LEF_READER::parseObs(std::ifstream& file) const {
 
         if (tokens[0] == "LAYER") {
             if (!currentLayer.empty()) {
-                obs->geometries.emplace_back(currentLayer, currentRects);
+                macro->obs.geometries.emplace_back(currentLayer, currentRects);
                 currentRects.clear();
             }
             currentLayer = tokens[1];
         }
         else if (tokens[0] == "RECT") {
-            Rect* rect = parseRect(tokens);
-            currentRects.push_back(*rect);
-            delete rect;
+            parseRect(tokens, currentRects);
         }
         else if (tokens[0] == "END") {
             if (!currentLayer.empty()) {
-                obs->geometries.emplace_back(currentLayer, currentRects);
+                macro->obs.geometries.emplace_back(currentLayer, currentRects);
             }
             break;
         }
     }
-    return obs;
 }
 
-Macro* LEF_READER::parseMacro(std::ifstream& file, const std::string& name) {
+void lef::LEF_READER::parseMacro(std::ifstream& file, const std::string& name, LEFData &lefs) {
     Macro* macro = new Macro();
     macro->name = name;
     std::string line;
@@ -261,14 +250,10 @@ Macro* LEF_READER::parseMacro(std::ifstream& file, const std::string& name) {
             hasXYSymmetry = (macro->symmetry == "XY");
         }
         else if (tokens[0] == "PIN") {
-            Pin* pin = parsePin(file, tokens[1]);
-            macro->pins.push_back(*pin);
-            delete pin;
+            parsePin(file, tokens[1], macro);
         }
         else if (tokens[0] == "OBS") {
-            Obs* obs = parseObs(file);
-            macro->obs = *obs;
-            delete obs;
+            parseObs(file, macro);
         }
         else if (tokens[0] == "END" && tokens.size() > 1 && tokens[1] == name) {
             break;
@@ -279,28 +264,25 @@ Macro* LEF_READER::parseMacro(std::ifstream& file, const std::string& name) {
         std::cout << "Macro '" << macro->name << "' has non-XY symmetry: " << macro->symmetry << std::endl;
     }
 
-    return macro;
+    lefs.addMacro(macro);
 }
 
-Site* LEF_READER::parseSite(std::ifstream& file, const std::string& name, const std::vector<Site*>& existingSites) {
+void lef::LEF_READER::parseSite(std::ifstream& file, const std::string& name, LEFData& lefs) {
+    if (lefs.getSiteByName(name)) {
+        std::string line;
+        while (getline(file, line)) {
+            line = trim(line);
+            if (line.empty()) continue;
 
-    for (const auto& site : existingSites) {
-        if (site->name == name) {
-            std::string line;
-            while (getline(file, line)) {
-                line = trim(line);
-                if (line.empty()) continue;
+            std::vector<std::string> tokens = tokenize(line);
+            if (tokens.empty()) continue;
 
-                std::vector<std::string> tokens = tokenize(line);
-                if (tokens.empty()) continue;
-
-                if (tokens[0] == "END" && tokens.size() > 1 && tokens[1] == name) {
-                    break;
-                }
+            if (tokens[0] == "END" && tokens.size() > 1 && tokens[1] == name) {
+                break;
             }
-            return nullptr;
         }
-    }
+        return;
+    }    
 
     Site* site = new Site();
     site->name = name;
@@ -327,12 +309,14 @@ Site* LEF_READER::parseSite(std::ifstream& file, const std::string& name, const 
             break;
         }
     }
-    return site;
+    lefs.addSite(site);
 }
 
-void LEF_READER::clear() {
+/*
+void lef::LEF_READER::clear() {
     for (auto macro : macros) delete macro;
     for (auto site : sites) delete site;
     macros.clear();
     sites.clear();
 }
+*/

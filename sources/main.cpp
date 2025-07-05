@@ -18,9 +18,10 @@ int main(int argc, char* argv[]) {
     if (!verilogReader.read(cmdLine.verilog, netlist))
         return EXIT_FAILURE;*/
 
-    LEF_READER   lef_reader;
+    lef::LEFData    lef;
+    lef::LEF_READER lef_reader;
     for (const auto& lef_file : cmdLine.lefs) {
-        if (!lef_reader.read(lef_file)) {
+        if (!lef_reader.read(lef_file, lef)) {
             return EXIT_FAILURE;
         }
     }

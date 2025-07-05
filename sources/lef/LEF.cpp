@@ -1,14 +1,66 @@
 #include "LEF.hpp"
 
-Site::~Site() {};
+#include <iostream>
 
-Macro::~Macro() {};
+lef::Site::~Site() {};
 
-Pin* Macro::getPinByName(const std::string& name) {
-	for (auto& pin : pins) {
-		if (pin.name == name) {
-			return &pin;
+lef::Macro::~Macro() {
+	for (int i = 0; i < pins.size(); ++i)
+		delete pins[i];
+	pins.clear();
+};
+
+lef::Pin* lef::Macro::getPinByName(const std::string& name) {
+	for (auto* pin : pins) {
+		if (pin->name == name) {
+			return pin;
 		}
 	}
+	return nullptr;
+}
+
+lef::LEFData::~LEFData() {
+	for (int i = 0; i < macroes.size(); ++i)
+		delete macroes[i];
+	macroes.clear();
+}
+
+void lef::LEFData::addMacro(Macro *_macro) {
+	if (!_macro) {
+		std::cout << "__err__ : LEFData::addMacro with null pointer was called.\n";
+		return;
+	}
+	for (auto *macro : macroes)
+		if (macro->name == _macro->name) {
+			std::cout << "__err__ : LEFData::addMacro: MACRO with the name '" << _macro->name 
+					  << "' already exists in macro collection.\n";
+			return;
+		}
+}
+
+void lef::LEFData::addSite(Site *_site) {
+	if (!_site) {
+		std::cout << "__err__ : LEFData::addSite with null pointer was called.\n";
+		return;
+	}
+	for (auto *site : sites)
+		if (site->name == _site->name) {
+			std::cout << "__err__ : LEFData::addSite: SITE with the name '" << _site->name 
+					  << "' already exists in macro collection.\n";
+			return;
+		}
+}
+
+lef::Macro* lef::LEFData::getMacroByName(const std::string &_name) {
+	for (auto *macro : macroes)
+		if (macro->name == _name)
+			return macro;
+	return nullptr;
+}
+
+lef::Site* lef::LEFData::getSiteByName(const std::string &_name) {
+	for (auto *site: sites)
+		if (site->name == _name)
+			return site;
 	return nullptr;
 }
