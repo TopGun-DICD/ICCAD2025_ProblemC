@@ -1,4 +1,0 @@
-﻿main.obj : error LNK2019: ссылка на неразрешенный внешний символ "public: __cdecl Netlist::~Netlist(void)" (??1Netlist@@QEAA@XZ) в функции main.
-VerilogReader.obj : error LNK2019: ссылка на неразрешенный внешний символ "public: __cdecl Port::Port(void)" (??0Port@@QEAA@XZ) в функции "private: bool __cdecl VerilogReader::readModuleInstance(struct Netlist &,struct Module *,char const *)" (?readModuleInstance@VerilogReader@@AEAA_NAEAUNetlist@@PEAUModule@@PEBD@Z).
-VerilogReader.obj : error LNK2019: ссылка на неразрешенный внешний символ "public: __cdecl Module::~Module(void)" (??1Module@@QEAA@XZ) в функции "public: void * __cdecl Module::`scalar deleting destructor'(unsigned int)" (??_GModule@@QEAAPEAXI@Z).
-..\..\bin\ICCAD2025_ProblemC.exe : fatal error LNK1120: неразрешенных внешних элементов: 3
