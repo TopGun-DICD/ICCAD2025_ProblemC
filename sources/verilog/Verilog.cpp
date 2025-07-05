@@ -1,10 +1,10 @@
 #include "Verilog.hpp"
 
-Port::Port() { 
+verilog::Port::Port() { 
     isPort = true; 
 }
 
-Module::~Module() {
+verilog::Module::~Module() {
     for (auto *net : nets)
         delete net;
     nets.clear();
@@ -16,28 +16,28 @@ Module::~Module() {
     instances.clear();
 }
 
-Net* Module::getNetByName(const std::string &name) {
+verilog::Net* verilog::Module::getNetByName(const std::string &name) {
     for (Net *net : nets)
         if (net->name == name)
             return net;
     return nullptr;
 }
 
-Port* Module::getPortByName(const std::string &name) {
+verilog::Port* verilog::Module::getPortByName(const std::string &name) {
     for (Port *port : ports)
         if (port->name == name)
             return port;
     return nullptr;
 }
 
-Instance* Module::getInstanceByName(const std::string &name) {
+verilog::Instance* verilog::Module::getInstanceByName(const std::string &name) {
     for (Instance *instance : instances)
         if (instance->name == name)
             return instance;
     return nullptr;
 }
 
-std::vector<Instance*> Module::getInstancesByType(const std::string &typeName) {
+std::vector<verilog::Instance*> verilog::Module::getInstancesByType(const std::string &typeName) {
     std::vector<Instance *> lst;
     for (Instance* instance : instances)
         if (instance->instanceOf->name == name)
@@ -45,14 +45,14 @@ std::vector<Instance*> Module::getInstancesByType(const std::string &typeName) {
     return lst;
 }
 
-Netlist::~Netlist() {
+verilog::Netlist::~Netlist() {
     for (auto *module : library) {
         delete module;
     }
     library.clear();
 }
 
-Module *Netlist::getModuleByName(const std::string &name) {
+verilog::Module * verilog::Netlist::getModuleByName(const std::string &name) {
     for (Module* module : library)
         if (module->name == name)
             return module;

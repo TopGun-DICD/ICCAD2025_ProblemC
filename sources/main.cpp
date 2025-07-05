@@ -13,8 +13,8 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
 
     //*
-    Netlist         netlist;
-    VerilogReader   verilogReader;
+    verilog::Netlist        netlist;
+    verilog::VerilogReader  verilogReader;
     if (!verilogReader.read(cmdLine.verilog, netlist))
         return EXIT_FAILURE;
     //*/
