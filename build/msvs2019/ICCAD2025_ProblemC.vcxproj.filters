@@ -19,6 +19,12 @@
     <Filter Include="Source Files\verilog">
       <UniqueIdentifier>{05904b6d-a687-4d16-bfac-2917ab92415d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\def">
+      <UniqueIdentifier>{6daff1ae-fb04-4a74-8c38-3a565b6b18dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\def">
+      <UniqueIdentifier>{8af501ef-0a95-4c1f-8a5c-e2a552360c23}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sources\main.cpp">
@@ -33,6 +39,12 @@
     <ClCompile Include="..\..\sources\verilog\Verilog.cpp">
       <Filter>Source Files\verilog</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sources\def\DEFReader.cpp">
+      <Filter>Source Files\def</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\def\DEFWriter.cpp">
+      <Filter>Source Files\def</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sources\cmdline.hpp">
@@ -43,6 +55,18 @@
     </ClInclude>
     <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp">
       <Filter>Header Files\verilog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\NoBoostSplit.hpp">
+      <Filter>Header Files\def</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\DEF.hpp">
+      <Filter>Header Files\def</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\DEFReader.hpp">
+      <Filter>Header Files\def</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\DEFWriter.hpp">
+      <Filter>Header Files\def</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

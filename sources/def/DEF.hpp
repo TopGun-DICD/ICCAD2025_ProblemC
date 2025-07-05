@@ -1,23 +1,12 @@
 #pragma once
 
-//#include <boost/algorithm/string.hpp>
-#include <iostream>
 #include <vector>
 #include <string>
-#include <map>
-#include <utility>
-#include <fstream>
-#include <map>
-#include <sstream>
-#include <algorithm>
-#include <memory>
-#include <type_traits>
-#include <locale>
-using namespace std;
 // Ориентация компонента
 
+namespace def {
 
-enum Orientation {
+enum class Orientation {
     N,    // 0°
     S,    // 180°
     E,    // 90°
@@ -27,10 +16,11 @@ enum Orientation {
     FE,   // Flipped E (mirror X)
     FW    // Flipped W (mirror X)
 };
+
 struct Rect_str {
-    string first;
-    string second;
-    Rect_str(string _first, string _second)
+    std::string first;
+    std::string second;
+    Rect_str(std::string _first, std::string _second)
         : first(_first), second(_second) {}
 };
 
@@ -46,69 +36,72 @@ struct Rect {
 struct Position {
     int x;          // Координата X
     int y;          // Координата Y
-    enum Orientation orientation; // Ориентация
+    enum Orientation orientation = Orientation::N; // Ориентация
 
     Position(int x = 0, int y = 0, Orientation orient = Orientation::N)
         : x(x), y(y), orientation(orient) {}
 };
 
-enum SOURCE_class {
+enum class SOURCE_class {
     NETLIST = 0,
     DIST = 1,
     USER = 2,
     TIMING = 3
 };
-enum FIXED_class {
+enum class FIXED_class {
     FIXED = 0,
     COVER = 1,
     PLACED = 2,
     UNPLACED = 3
 };
+
 class COMPONENTS_clas {
 public:
-    string compName;
-    string modelName;
-    //string EQMASTER;
+    std::string compName;
+    std::string modelName;
+    //std::string EQMASTER;
     Position POS;
-    enum SOURCE_class SOURCE;
-    enum FIXED_class FIXED;
+    SOURCE_class SOURCE;
+    FIXED_class FIXED;
     //int HALO;
-    //string PROPERTY;
-    // string REGION;
+    //std::string PROPERTY;
+    // std::string REGION;
     //int ROUTEHALO;
-    //string minLayer;
-    //string maxLayer;
+    //std::string minLayer;
+    //std::string maxLayer;
     //int WEIGHT;
-    COMPONENTS_clas(string _compName, string _modelName) : compName(_compName), modelName(_modelName) {}
+    COMPONENTS_clas(std::string _compName, std::string _modelName) : compName(_compName), modelName(_modelName) {}
     COMPONENTS_clas() {}
 };
+
 class BLOCKAGES_class {
-    string layerName;
+    std::string layerName;
     //Вернусь позже стр 242
-    vector<Rect> RECT;
+    std::vector<Rect> RECT;
     int SPACING = 0;
     int DESIGNRULEWIDTH = 0;
-    string COMPONENT_compName;
-    string FILLS;
-    string SLOTS;
-    string PUSHDOWN;
-    string EXCEPTPGNET;
-    vector<Rect> POLYGON;
-    string SOFT;///Вот здесь надо подумать над перечислениями с 243
-    string PARTIAL;
-    string COMPONENT;
+    std::string COMPONENT_compName;
+    std::string FILLS;
+    std::string SLOTS;
+    std::string PUSHDOWN;
+    std::string EXCEPTPGNET;
+    std::vector<Rect> POLYGON;
+    std::string SOFT;///Вот здесь надо подумать над перечислениями с 243
+    std::string PARTIAL;
+    std::string COMPONENT;
 };
+
 class VIAS_class {
-
-
 };
-enum DIRECTION_class {
+
+enum class DIRECTION_class {
     INPUT,
     OUTPUT,
     INOUT,
     FEEDTHRU
 };
-enum USE_class {
+
+enum class USE_class {
     SIGNAL,
     POWER,
     GROUND,
@@ -118,103 +111,108 @@ enum USE_class {
     SCAN,
     RESET
 };
+
 class VIA_class {
 public:
-    string viaName;
+    std::string viaName;
     int x;
     int y;
 };
+
 class LAYER_class {
 public:
-    string layerName;
+    std::string layerName;
     Rect rect;
 };
 
 class PINS_class {
 public:
-    string pinName;
-    string netName;
+    std::string pinName;
+    std::string netName;
     int SPECIAL = 0;
     enum DIRECTION_class DIRECTION;
     //NETEXPR
     //SUPPLYSENSITIVITY powerPinName
     //  GROUNDSENSITIVITY groundPinName
     enum USE_class USE;
-    vector<LAYER_class>  LAYER;
+    std::vector<LAYER_class>  LAYER;
     VIA_class VIA;
     enum FIXED_class PLACED_PIN;
     Position POS;
-    PINS_class(string _compName, string _modelName) : pinName(_compName), netName(_modelName) {}
+    PINS_class(std::string _compName, std::string _modelName) : pinName(_compName), netName(_modelName) {}
 };
+
 class NETS_class {
 public:
-    string netName;
-    vector<Rect_str> Net_unit;
+    std::string netName;
+    std::vector<Rect_str> Net_unit;
     USE_class USE;
-    NETS_class(string netName) : netName(netName) {}
+    NETS_class(std::string netName) : netName(netName) {}
 };
+
 class SPECIALNETS_class {
-
-
 };
-  //O
+
+//O
 class DEF_File {
 public:
     int Flag_per_tz = 0;
     char BUSBITCHARS[2]; // Разделяющие символы для шинных битов(нужно уточнить их 2 или 3) gпо умолчанию []
     float version;
     char DIVIDERCHAR = '/';  //символ разделитель по умолчанию /
-    string DESIGN;
-   // vector<string> PRO; //раскоменчивание все ломает
+    std::string DESIGN;
+   // std::vector<std::string> PRO; //раскоменчивание все ломает
 
     int UNITS_DISTANCE_MICRONS;
     Rect DIEAREA;
-    vector<string> beginning;// мусор в начале, не парсим
+    std::vector<std::string> beginning;// мусор в начале, не парсим
 
     int COUNT_COMPONENTS = 0;
-    vector<COMPONENTS_clas> COMPONENTS;
+    std::vector<COMPONENTS_clas> COMPONENTS;
     int numBlockages;
-    vector<BLOCKAGES_class> BLOCKAGES;
+    std::vector<BLOCKAGES_class> BLOCKAGES;
     int COUNT_VIAS = 0;
-    vector<string> VIAS_str;// читается без нормального парса
+    std::vector<std::string> VIAS_str;// читается без нормального парса
     int COUNT_PINS = 0;
-    vector<PINS_class> PINS;
+    std::vector<PINS_class> PINS;
     int COUNT_NETS = 0;
-    vector<NETS_class> NETS;
+    std::vector<NETS_class> NETS;
     int COUNT_SPECIALNETS = 0;
-    vector<NETS_class> SPECIALNETS;
+    std::vector<NETS_class> SPECIALNETS;
 
-    void push_back_COMPONENTS(string a, string b) {
+    void push_back_COMPONENTS(std::string a, std::string b) {
         COMPONENTS_clas buffer_components(a, b);
         COMPONENTS.push_back(buffer_components);
     }
-    void push_back_NETS_rect_u(string a, string b) {
+    void push_back_NETS_rect_u(std::string a, std::string b) {
         Rect_str buffer(a, b);
         NETS[NETS.size() - 1].Net_unit.push_back(buffer);
     }
-    void push_back_SPECIALNETS_rect_u(string a, string b) {
+    void push_back_SPECIALNETS_rect_u(std::string a, std::string b) {
         Rect_str buffer(a, b);
         SPECIALNETS[SPECIALNETS.size() - 1].Net_unit.push_back(buffer);
     }
-    void push_back_PINS(string a, string b) {
+    void push_back_PINS(std::string a, std::string b) {
         PINS_class buffer_pins(a, b);
         PINS.push_back(buffer_pins);
     }
-    void push_back_NETS(string a) {
+    void push_back_NETS(std::string a) {
         NETS_class buffer_nets(a);
         NETS.push_back(buffer_nets);
     }
-    void push_back_SPECIALNETS(string a) {
+    void push_back_SPECIALNETS(std::string a) {
         NETS_class buffer_nets(a);
         SPECIALNETS.push_back(buffer_nets);
     }
+    Position return_component_pos(std::string name) {
+        for (int o = 0; o < COMPONENTS.size(); o++) {
+            if (COMPONENTS[o].compName == name) {
+                return  COMPONENTS[o].POS;
+            }
+        }
+    }
+
 };
-void parsPROPERTYDEFINITIONS(ifstream* inFile, DEF_File* def, int* i);
-void parsComponents(ifstream* inFile, DEF_File* def, int* i);
-void parsNets(ifstream* inFile, DEF_File* def, int* i);
-void parsSpecialnets(ifstream* inFile, DEF_File* def, int* i);
-void parsPins(ifstream* inFile, DEF_File* def, int* i);
-void parsVias(ifstream* inFile, DEF_File* def, int* i);
-Position return_component_pos(DEF_File* def, string name);
-void swup_comp(DEF_File* def, string name1, string name2);
-void ReadDEF(DEF_File* def, string nameInFile);
+
+}
+

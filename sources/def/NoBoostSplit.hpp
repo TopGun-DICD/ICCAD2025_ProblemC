@@ -1,9 +1,8 @@
-    #pragma once
-#include "DEFReader.hpp"
+#pragma once
 
-#ifndef SPLIT_HPP
-#define SPLIT_HPP
-
+#include <string>
+#include <algorithm>
+#include <locale>
 
 namespace my_boost {
 
@@ -92,8 +91,5 @@ namespace my_boost {
         }
 
     } // namespace my_boost
-
-
-#endif // SPLIT_HPP
 
 
