@@ -1,11 +1,11 @@
-#include <iostream>
 
 #include "cmdline.hpp"
 #include "verilog/Verilog.hpp"
 #include "verilog/VerilogReader.hpp"
 #include "lef/LEF.hpp"
 #include "lef/LEF_READER.hpp"
-
+#include "def/DEFReader.hpp"
+#include "def/DEFWriter.hpp"
 
 int main(int argc, char* argv[]) {
     CmdLine cmdLine;
@@ -19,6 +19,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     //*/
 
+    //*
     lef::LEFData    lef;
     lef::LEF_READER lef_reader;
     for (const auto& lef_file : cmdLine.lefs) {
@@ -26,7 +27,21 @@ int main(int argc, char* argv[]) {
             return EXIT_FAILURE;
         }
     }
+    //*/
 
+    //*
+    def::DEF_File   def;
+    def::DEFReader  defReader;
+    if (!defReader.ReadDEF(cmdLine.def, def))
+        return EXIT_FAILURE;
+    //*/
+
+    // Process loaded data
+
+    //*
+    def::DEFWriter defWriter;
+    defWriter.OutDEF("D:\\out.def", def);
+    //*/
     return EXIT_SUCCESS;
 
 }
