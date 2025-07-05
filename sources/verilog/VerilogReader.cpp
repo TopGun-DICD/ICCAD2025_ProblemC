@@ -8,14 +8,14 @@
 
 std::unordered_set<char> oneByteTokens{ '(', ')', '[', ']', '.', ',', '*', '/', '+', '-', '@', '`', '$', '\\', ';', ':', '#', '<' };
 
-VerilogReader::~VerilogReader() {
+verilog::VerilogReader::~VerilogReader() {
     if (hdlCode) {
         delete [] hdlCode;
         hdlCode = nullptr;
     }
 }
 
-bool VerilogReader::read(const std::string &fname, Netlist &netlist) {
+bool verilog::VerilogReader::read(const std::string &fname, Netlist &netlist) {
     std::cout << "Reading input verilog file '" << fname << "'...\n";
     std::time_t timeStart = std::clock();
 
@@ -70,13 +70,13 @@ bool VerilogReader::read(const std::string &fname, Netlist &netlist) {
         }
     }
 
-    std::cout << "Done reading input file. File has been read in " 
+    std::cout << "Done reading input verilog file. File has been read in " 
               << timeValMin << " min(s) " << timeValSec << " sec(s) " << timeValMsec << " msec(s)" << std::endl;
 
     return true;
 }
 
-bool VerilogReader::readHDLCode(const std::string &fname) {
+bool verilog::VerilogReader::readHDLCode(const std::string &fname) {
     std::ifstream in(fname, std::ios::in);
     if (!in.is_open())
         return false;
@@ -94,7 +94,7 @@ bool VerilogReader::readHDLCode(const std::string &fname) {
     return true;
 }
 
-void VerilogReader::readToken(char *token) {
+void verilog::VerilogReader::readToken(char *token) {
     token[0] = '\0';
     int i = 0;
 token_start:
@@ -160,7 +160,7 @@ token_start:
     }
 }
 
-void VerilogReader::readIdentifier(char *token) {
+void verilog::VerilogReader::readIdentifier(char *token) {
     readToken(token);
     if (token[0] != '\\')
         return;
@@ -173,14 +173,14 @@ void VerilogReader::readIdentifier(char *token) {
     token[j] = '\0';
 }
 
-void VerilogReader::readToTheEOL() {
+void verilog::VerilogReader::readToTheEOL() {
     while (hdlCode[posInCode] != '\n' && posInCode < codeLength)
         ++posInCode;
     ++posInCode;
     ++line;
 }
 
-bool VerilogReader::readModule(Netlist &netlist) {
+bool verilog::VerilogReader::readModule(Netlist &netlist) {
     char token[MAX_TOKEN_LENGTH];
     token[0] = '\0';
 
@@ -217,7 +217,7 @@ bool VerilogReader::readModule(Netlist &netlist) {
     return true;
 }
 
-bool VerilogReader::readModulePorts(Module *module) {
+bool verilog::VerilogReader::readModulePorts(Module *module) {
     char token[MAX_TOKEN_LENGTH] = { 0 };
 
     
@@ -243,7 +243,7 @@ bool VerilogReader::readModulePorts(Module *module) {
     return true;
 }
 
-bool VerilogReader::readModulePortsOfDirection(Module *module, PortDirection dir) {
+bool verilog::VerilogReader::readModulePortsOfDirection(Module *module, PortDirection dir) {
     char token[MAX_TOKEN_LENGTH] = { 0 };
 
     while (true) {
@@ -270,7 +270,7 @@ bool VerilogReader::readModulePortsOfDirection(Module *module, PortDirection dir
     return true;
 }
 
-bool VerilogReader::readModuleNetsOfType(Module *module, NetType type) {
+bool verilog::VerilogReader::readModuleNetsOfType(Module *module, NetType type) {
     char token[MAX_TOKEN_LENGTH] = { 0 };
 
     while (true) {
@@ -314,7 +314,7 @@ bool VerilogReader::readModuleNetsOfType(Module *module, NetType type) {
     return true;
 }
 
-bool VerilogReader::readModuleInstance(Netlist &netlist, Module *module, const char *moduleType) {
+bool verilog::VerilogReader::readModuleInstance(Netlist &netlist, Module *module, const char *moduleType) {
     char token[MAX_TOKEN_LENGTH] = { 0 };
 
     std::string type = moduleType;
@@ -406,7 +406,7 @@ bool VerilogReader::readModuleInstance(Netlist &netlist, Module *module, const c
     return true;
 }
 
-bool VerilogReader::performBasicChecks(Netlist &netlist) {
+bool verilog::VerilogReader::performBasicChecks(Netlist &netlist) {
     std::cout << "Performing basic ckecks..." << std::endl;
     for (int i = 0; i < netlist.library.size(); ++i) {
         for(int j = 0; j < netlist.library[i]->instances.size(); ++j)
@@ -418,7 +418,7 @@ bool VerilogReader::performBasicChecks(Netlist &netlist) {
     return true;
 }
 
-bool VerilogReader::findTopModule(Netlist &netlist) {
+bool verilog::VerilogReader::findTopModule(Netlist &netlist) {
     std::vector<Module *> unusedCells;
     for (size_t i = 0; i < netlist.library.size(); ++i)
         if (!netlist.library[i]->numberOfMyInstances)
