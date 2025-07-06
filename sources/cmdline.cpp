@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <iostream>
 
-#define PROGRAM_VERSION "0.0.2"
+#define PROGRAM_VERSION "0.0.4"
 #if defined _WIN32
 #   define DELIMETER "\\"
 #else
