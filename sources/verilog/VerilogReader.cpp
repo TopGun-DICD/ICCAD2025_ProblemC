@@ -16,9 +16,6 @@ verilog::VerilogReader::~VerilogReader() {
 }
 
 bool verilog::VerilogReader::read(const std::string &fname, Netlist &netlist) {
-    std::cout << "Reading input verilog file '" << fname << "'...\n";
-    std::time_t timeStart = std::clock();
-
     if (!readHDLCode(fname))
         return false;
 
@@ -49,29 +46,6 @@ bool verilog::VerilogReader::read(const std::string &fname, Netlist &netlist) {
 
     performBasicChecks(netlist);
     findTopModule(netlist);
-
-    std::time_t timeStop = std::clock() - timeStart;
-    std::time_t timeValMin = 0;
-    std::time_t timeValSec = 0;
-    std::time_t timeValMsec = timeStop;
-
-    if (timeStop < 1000) {
-        if (timeStop == 0)
-            timeValMsec = 1;
-    }
-    else {
-        if (timeStop > 1000) {
-            timeValSec = timeStop / 1000;
-            timeValMsec = timeStop - timeValSec * 1000;
-        }
-        if (timeValSec > 60) {
-            timeValMin = timeValSec / 60;
-            timeValSec = timeValSec - (timeValMin * 60);
-        }
-    }
-
-    std::cout << "Done reading input verilog file. File has been read in " 
-              << timeValMin << " min(s) " << timeValSec << " sec(s) " << timeValMsec << " msec(s)" << std::endl;
 
     return true;
 }
@@ -407,14 +381,14 @@ bool verilog::VerilogReader::readModuleInstance(Netlist &netlist, Module *module
 }
 
 bool verilog::VerilogReader::performBasicChecks(Netlist &netlist) {
-    std::cout << "Performing basic ckecks..." << std::endl;
+    std::cout << "  Performing basic ckecks..." << std::endl;
     for (int i = 0; i < netlist.library.size(); ++i) {
         for(int j = 0; j < netlist.library[i]->instances.size(); ++j)
             if (!netlist.library[i]->instances[j]->instanceOf)
-                std::cerr << "  __err__ : no base module found for instance " << netlist.library[i]->instances[j]->name 
+                std::cerr << "    __err__ : no base module found for instance " << netlist.library[i]->instances[j]->name 
                           << " in module " << netlist.library[i]->name;
     }
-    std::cout << "Basic ckecks completed." << std::endl;
+    std::cout << "  Basic ckecks completed." << std::endl;
     return true;
 }
 

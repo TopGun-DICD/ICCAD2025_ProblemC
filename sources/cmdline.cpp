@@ -16,8 +16,8 @@
 //#define ENABLE_LIB_READING
 
 bool CmdLine::parse(int argc, char *argv[]) {
+    std::cout << "ICCAD 2025 TaskC solver [cadc1079 team]\n\n";
     if (1 == argc) {
-        std::cout << "ICCAD 2025 TaskC solver [cadc1079 team]\n\n";
         std::cout << "To learn about available options please run:\n  cadc1079 --help\n\n";
         return false;
     }
@@ -98,6 +98,15 @@ bool CmdLine::parse(int argc, char *argv[]) {
                     return false;
                 continue;
             }
+        if (!strcmp(argv[i], "--out"))
+            if (i == argc - 1) {
+                std::cerr << "__err__ : '--out' option should be followed by a valid path to the output file.          \nAbort.";
+                break;
+            }
+            else {
+                outFile = argv[++i];
+                continue;
+            }
     }
 
     // Perform elementary checks
@@ -117,6 +126,11 @@ bool CmdLine::parse(int argc, char *argv[]) {
         false) {
         std::cerr << "__err__ : Some reqiured files are missing. Abort.\n\n";
         return false;
+    }
+
+    if (outFile.empty()) {
+        std::filesystem::path path(def);
+        outFile = path.parent_path().string() + DELIMETER + path.stem().string() + "_result.def";
     }
 
     return true;
@@ -146,6 +160,14 @@ void CmdLine::printHelpString() {
     std::cout << "    --libs <path>      - path to a folder with Liberty files in it\n";
     std::cout << "  or\n";
     std::cout << "    --asap7 <path>     - path to the ASAP7 folder with the same structure as in the given example\n";
+    std::cout << "\n";
+    std::cout << "  To specify output DEF file may should use this arg:\n";
+    std::cout << "    --out <file.def>   - path to a file the results shoud be stored to\n";
+    std::cout << "    Notes to this argument:\n";
+    std::cout << "        - if it is not specified the result will be written in a file named as an input one but with the suffix '_result'\n";
+    std::cout << "          (fore example, if input file is 'tests/aes_cipher_top/aes_cipher_top.def' then the result will be written to\n";
+    std::cout << "          'tests/aes_cipher_top/aes_cipher_top_result.def'\n";
+    std::cout << "        - if the given file already exist it will be overwritten without prompt\n\n";
 }
 
 bool CmdLine::findVerilog(const char *_path) {

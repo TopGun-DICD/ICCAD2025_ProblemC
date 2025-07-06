@@ -10,9 +10,6 @@ lef::LEF_READER::~LEF_READER() {
 
 bool lef::LEF_READER::read(const std::string& filename, LEFData &lefs) {
 
-    std::cout << "Reading input LEF file '" << filename << "'...\n";
-    std::time_t timeStart = std::clock();
-
     std::ifstream file(filename);
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + filename);
@@ -42,32 +39,10 @@ bool lef::LEF_READER::read(const std::string& filename, LEFData &lefs) {
         }
     }
 
-    std::time_t timeStop = std::clock() - timeStart;
-    std::time_t timeValMin = 0;
-    std::time_t timeValSec = 0;
-    std::time_t timeValMsec = timeStop;
-
-    if (timeStop < 1000) {
-        if (timeStop == 0)
-            timeValMsec = 1;
-    }
-    else {
-        if (timeStop > 1000) {
-            timeValSec = timeStop / 1000;
-            timeValMsec = timeStop - timeValSec * 1000;
-        }
-        if (timeValSec > 60) {
-            timeValMin = timeValSec / 60;
-            timeValSec = timeValSec - (timeValMin * 60);
-        }
-    }
-
-    std::cout << "Done reading input LEF file. File has been read in "
-        << timeValMin << " min(s) " << timeValSec << " sec(s) " << timeValMsec << " msec(s)" << std::endl;
-        file.close();
+    file.close();
       
-        return true;
-    }
+    return true;
+}
 
 /*
 lef::Macro* lef::LEF_READER::getMacroByName(const std::string& name) const {

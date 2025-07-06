@@ -19,6 +19,18 @@
     <Filter Include="Source Files\verilog">
       <UniqueIdentifier>{05904b6d-a687-4d16-bfac-2917ab92415d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\lef">
+      <UniqueIdentifier>{c56b773a-cbbd-4a05-bae8-486c12adc914}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lef">
+      <UniqueIdentifier>{2badfd92-3246-46b7-b86e-3bb52eb95737}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\def">
+      <UniqueIdentifier>{8fb46e0d-802c-4201-881d-04c442c99f9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\def">
+      <UniqueIdentifier>{9ac8b342-ce24-4610-a6b6-4d5c67d9b8a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sources\main.cpp">
@@ -33,11 +45,17 @@
     <ClCompile Include="..\..\sources\verilog\Verilog.cpp">
       <Filter>Source Files\verilog</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sources\DEFWriter.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\sources\lef\LEF.cpp">
+      <Filter>Source Files\lef</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sources\DEFReader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\sources\lef\LEF_READER.cpp">
+      <Filter>Source Files\lef</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\def\DEFWriter.cpp">
+      <Filter>Source Files\def</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\def\DEFReader.cpp">
+      <Filter>Source Files\def</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,14 +68,23 @@
     <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp">
       <Filter>Header Files\verilog</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sources\NoBoostSplit.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\sources\lef\LEF.hpp">
+      <Filter>Header Files\lef</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sources\DEFWriter.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\sources\lef\LEF_READER.hpp">
+      <Filter>Header Files\lef</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sources\DEFReader.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\sources\def\DEF.hpp">
+      <Filter>Header Files\def</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\DEFReader.hpp">
+      <Filter>Header Files\def</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\DEFWriter.hpp">
+      <Filter>Header Files\def</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\NoBoostSplit.hpp">
+      <Filter>Header Files\def</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

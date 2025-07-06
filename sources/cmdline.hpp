@@ -9,6 +9,7 @@ public:
                                 def;
     std::vector<std::string>    lefs,
                                 libs;
+    std::string                 outFile;
 public:
     bool parse(int argc, char *argv[]);
 private:
