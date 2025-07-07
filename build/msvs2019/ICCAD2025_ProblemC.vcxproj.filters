@@ -31,6 +31,12 @@
     <Filter Include="Header Files\lef">
       <UniqueIdentifier>{d26db9ba-4f89-450a-81dd-1ca39c4c90b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\algorithm">
+      <UniqueIdentifier>{c59c0b54-1003-4758-ae2a-a71a37f2d540}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\algorithm">
+      <UniqueIdentifier>{4ab99651-82eb-4349-9fee-161fbab49d2c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sources\main.cpp">
@@ -56,6 +62,9 @@
     </ClCompile>
     <ClCompile Include="..\..\sources\def\DEFWriter.cpp">
       <Filter>Source Files\def</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\algorithm\algorithm.cpp">
+      <Filter>Source Files\algorithm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +94,9 @@
     </ClInclude>
     <ClInclude Include="..\..\sources\lef\LEF.hpp">
       <Filter>Header Files\lef</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\algorithm\algorithm.hpp">
+      <Filter>Header Files\algorithm</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

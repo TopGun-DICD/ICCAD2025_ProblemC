@@ -37,6 +37,22 @@ verilog::Instance* verilog::Module::getInstanceByName(const std::string &name) {
     return nullptr;
 }
 
+verilog::Instance *verilog::Module::getInstanceByDEFName(const std::string &name) {
+    size_t pos = name.find_first_of('\\');
+    if (pos == std::string::npos)
+        return getInstanceByName(name);
+
+    std::string tempName = name;
+
+    while (pos != std::string::npos) {
+        tempName.erase(pos, 1);
+        pos = tempName.find_first_of('\\');
+    }
+    tempName = '\\' + tempName;
+
+    return getInstanceByName(tempName);
+}
+
 std::vector<verilog::Instance*> verilog::Module::getInstancesByType(const std::string &typeName) {
     std::vector<Instance *> lst;
     for (Instance* instance : instances)

@@ -78,45 +78,45 @@ void def::DEFWriter::OutDEF(std::string nameOutFile, DEF_File& def) {
     outFile << "END VIAS" << std::endl;
     outFile << "COMPONENTS " << def.COMPONENTS.size() << " ;" << std::endl;
     for (int i = 0; i < def.COMPONENTS.size(); i++) {
-        outFile << "\t" <<"- " << def.COMPONENTS[i].compName << " " << def.COMPONENTS[i].modelName << " + " ;
-        if ((def.COMPONENTS[i].SOURCE == SOURCE_class::NETLIST) || (def.COMPONENTS[i].SOURCE == SOURCE_class::DIST) || 
-            (def.COMPONENTS[i].SOURCE == SOURCE_class::USER) || (def.COMPONENTS[i].SOURCE == SOURCE_class::TIMING)) {
-            outFile << "SOURCE "<< SOURCE_class_transform(def.COMPONENTS[i].SOURCE) << " + ";
+        outFile << "\t" <<"- " << def.COMPONENTS[i]->compName << " " << def.COMPONENTS[i]->modelName << " + " ;
+        if ((def.COMPONENTS[i]->SOURCE == SOURCE_class::NETLIST) || (def.COMPONENTS[i]->SOURCE == SOURCE_class::DIST) || 
+            (def.COMPONENTS[i]->SOURCE == SOURCE_class::USER) || (def.COMPONENTS[i]->SOURCE == SOURCE_class::TIMING)) {
+            outFile << "SOURCE "<< SOURCE_class_transform(def.COMPONENTS[i]->SOURCE) << " + ";
         }
-        outFile << FIXED_class_transform(def.COMPONENTS[i].FIXED) << " ( " << def.COMPONENTS[i].POS.x << " " << def.COMPONENTS[i].POS.y << " ) "<< Orientation_transform(def.COMPONENTS[i].POS.orientation) << " ;" << std::endl;
+        outFile << FIXED_class_transform(def.COMPONENTS[i]->FIXED) << " ( " << def.COMPONENTS[i]->POS.x << " " << def.COMPONENTS[i]->POS.y << " ) "<< Orientation_transform(def.COMPONENTS[i]->POS.orientation) << " ;" << std::endl;
     }
     outFile << "END COMPONENTS" << std::endl;
     outFile << "PINS " << def.PINS.size() << " ;" << std::endl;
     for (int i = 0; i < def.PINS.size(); i++) {
-        outFile << "\t- " << def.PINS[i].pinName << " + NET " << def.PINS[i].netName << " + ";
-        if (def.PINS[i].SPECIAL == 1) {
+        outFile << "\t- " << def.PINS[i]->pinName << " + NET " << def.PINS[i]->netName << " + ";
+        if (def.PINS[i]->SPECIAL == 1) {
             outFile << "SPECIAL" << " + ";
         }
-        outFile << "DIRECTION " << DIRECTION_class_transform(def.PINS[i].DIRECTION) << " + USE " << USE_class_transform(def.PINS[i].USE) << std::endl;
+        outFile << "DIRECTION " << DIRECTION_class_transform(def.PINS[i]->DIRECTION) << " + USE " << USE_class_transform(def.PINS[i]->USE) << std::endl;
         outFile << "\t  + PORT" << std::endl;
-        for (int o = 0; o < def.PINS[i].LAYER.size();o++) {
-            outFile << "\t\t+ LAYER " << def.PINS[i].LAYER[o].layerName << " ( " << def.PINS[i].LAYER[o].rect.x1 << " " << def.PINS[i].LAYER[o].rect.x2 << " ) ( " << def.PINS[i].LAYER[o].rect.y1 << " " << def.PINS[i].LAYER[o].rect.y2 << " )" << std::endl;
+        for (int o = 0; o < def.PINS[i]->LAYER.size();o++) {
+            outFile << "\t\t+ LAYER " << def.PINS[i]->LAYER[o].layerName << " ( " << def.PINS[i]->LAYER[o].rect.x1 << " " << def.PINS[i]->LAYER[o].rect.x2 << " ) ( " << def.PINS[i]->LAYER[o].rect.y1 << " " << def.PINS[i]->LAYER[o].rect.y2 << " )" << std::endl;
         }
-        outFile << "\t\t+ " << FIXED_class_transform(def.PINS[i].PLACED_PIN) << " ( " << def.PINS[i].POS.x << " " << def.PINS[i].POS.y << " ) " << Orientation_transform(def.PINS[i].POS.orientation) << " ;"<< std::endl;
+        outFile << "\t\t+ " << FIXED_class_transform(def.PINS[i]->PLACED_PIN) << " ( " << def.PINS[i]->POS.x << " " << def.PINS[i]->POS.y << " ) " << Orientation_transform(def.PINS[i]->POS.orientation) << " ;"<< std::endl;
     }
     outFile << "END PINS" << std::endl;
 
     outFile << "SPECIALNETS " << def.SPECIALNETS.size() << " ;"<< std::endl;
     for (int i = 0; i < def.SPECIALNETS.size(); i++) {
-        outFile << "\t- " << def.SPECIALNETS[i].netName;
-        for (int o = 0; o < def.SPECIALNETS[i].Net_unit.size(); o++) {
-            outFile << " ( " << def.SPECIALNETS[i].Net_unit[o].first << " " << def.SPECIALNETS[i].Net_unit[o].second << " )";
+        outFile << "\t- " << def.SPECIALNETS[i]->netName;
+        for (int o = 0; o < def.SPECIALNETS[i]->Net_unit.size(); o++) {
+            outFile << " ( " << def.SPECIALNETS[i]->Net_unit[o].first << " " << def.SPECIALNETS[i]->Net_unit[o].second << " )";
         }
-        outFile << " + USE " << USE_class_transform(def.SPECIALNETS[i].USE) << std::endl;
+        outFile << " + USE " << USE_class_transform(def.SPECIALNETS[i]->USE) << std::endl;
     }
     
     outFile << "END SPECIALNETS" << std::endl;
 
     outFile << "NETS " << def.NETS.size() << " ;" << std::endl;
     for (int i = 0; i < def.NETS.size(); i++) {
-        outFile << "\t- " << def.NETS[i].netName;
-        for (int o = 0; o < def.NETS[i].Net_unit.size(); o++) {
-            outFile << " ( " << def.NETS[i].Net_unit[o].first << " " << def.NETS[i].Net_unit[o].second << " )";
+        outFile << "\t- " << def.NETS[i]->netName;
+        for (int o = 0; o < def.NETS[i]->Net_unit.size(); o++) {
+            outFile << " ( " << def.NETS[i]->Net_unit[o].first << " " << def.NETS[i]->Net_unit[o].second << " )";
             if ((o != 0)&&(o%5 == 4 )) outFile << std::endl;
         }
         outFile << std::endl;

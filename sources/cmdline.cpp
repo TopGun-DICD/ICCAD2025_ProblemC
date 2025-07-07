@@ -16,7 +16,7 @@
 //#define ENABLE_LIB_READING
 
 bool CmdLine::parse(int argc, char *argv[]) {
-    std::cout << "ICCAD 2025 TaskC solver [cadc1079 team]\n\n";
+    std::cout << "ICCAD 2025 TaskC solver [team cadc1079]\n\n";
     if (1 == argc) {
         std::cout << "To learn about available options please run:\n  cadc1079 --help\n\n";
         return false;

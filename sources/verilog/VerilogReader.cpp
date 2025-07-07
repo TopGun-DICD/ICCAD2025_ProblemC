@@ -15,9 +15,12 @@ verilog::VerilogReader::~VerilogReader() {
     }
 }
 
-bool verilog::VerilogReader::read(const std::string &fname, Netlist &netlist) {
-    if (!readHDLCode(fname))
+bool verilog::VerilogReader::read(const std::string &_fname, Netlist &_netlist, lef::LEFData &_lef) {
+    if (!readHDLCode(_fname))
         return false;
+
+    netlist = &_netlist;
+    lef = &_lef;
 
     char token[MAX_TOKEN_LENGTH];
     while (posInCode < codeLength) {
@@ -30,7 +33,7 @@ bool verilog::VerilogReader::read(const std::string &fname, Netlist &netlist) {
                 return false;
             case 'm':
                 if (!strcmp(token, "module")) {
-                    if (!readModule(netlist))
+                    if (!readModule())
                         return false;
                     break;
                 }
@@ -42,10 +45,9 @@ bool verilog::VerilogReader::read(const std::string &fname, Netlist &netlist) {
         }
     }
 
-    netlist.fileName = fname;
+    netlist->fileName = _fname;
 
-    performBasicChecks(netlist);
-    findTopModule(netlist);
+    PostProcess();
 
     return true;
 }
@@ -154,14 +156,14 @@ void verilog::VerilogReader::readToTheEOL() {
     ++line;
 }
 
-bool verilog::VerilogReader::readModule(Netlist &netlist) {
+bool verilog::VerilogReader::readModule() {
     char token[MAX_TOKEN_LENGTH];
     token[0] = '\0';
 
     readIdentifier(token);
 
     Module *module = new Module;
-    netlist.library.push_back(module);
+    netlist->library.push_back(module);
     module->name = token;
 
     readToken(token);
@@ -170,7 +172,7 @@ bool verilog::VerilogReader::readModule(Netlist &netlist) {
             std::cerr << "  __wrn__ (" << line << ") : module with no ports was met: '" << module->name << "'" << std::endl;
         else {
             std::cerr << "  __err__ (" << line << "): unexpected token in module '" << module->name << "' definition. Abort." << std::endl;
-            netlist.library.pop_back();
+            netlist->library.pop_back();
             delete module;
             return false;
         }
@@ -185,7 +187,7 @@ bool verilog::VerilogReader::readModule(Netlist &netlist) {
         if (!strcmp(token, "inout"))    { if (!readModulePortsOfDirection(module, PortDirection::inout))    return false; continue; }
         if (!strcmp(token, "wire"))     { if (!readModuleNetsOfType(module, NetType::wire)) return false;   continue; }
         if (!strcmp(token, "reg"))      { if (!readModuleNetsOfType(module, NetType::reg)) return false;    continue; }
-        if (!readModuleInstance(netlist, module, token))
+        if (!readModuleInstance(module, token))
             return false;
     }
     return true;
@@ -201,7 +203,7 @@ bool verilog::VerilogReader::readModulePorts(Module *module) {
             continue;
 
         Port *port = new Port;
-        port->owner     = module;
+        //port->owner     = module;
         module->ports.push_back(port);
 
         if (!strcmp(token, "input"))    { port->direction = PortDirection::input;   readIdentifier(token); }
@@ -281,22 +283,22 @@ bool verilog::VerilogReader::readModuleNetsOfType(Module *module, NetType type) 
         }
         Net *net    = new Net;
         module->nets.push_back(net);
-        net->owner  = module;
+        //net->owner  = module;
         net->name   = token;
         net->type   = type;
     }
     return true;
 }
 
-bool verilog::VerilogReader::readModuleInstance(Netlist &netlist, Module *module, const char *moduleType) {
+bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_moduleType) {
     char token[MAX_TOKEN_LENGTH] = { 0 };
 
-    std::string type = moduleType;
+    std::string type = _moduleType;
     readIdentifier(token);
     std::string name = token;
 
     Instance* instance = new Instance;
-    module->instances.push_back(instance);
+    _module->instances.push_back(instance);
     instance->name = name;
 
     std::vector<std::string>    pins,
@@ -330,13 +332,13 @@ bool verilog::VerilogReader::readModuleInstance(Netlist &netlist, Module *module
     }
     readToken(token);
 
-    for (size_t i = 0; i < netlist.library.size(); ++i)
-        if (netlist.library[i]->name == moduleType)
-            instance->instanceOf = netlist.library[i];
+    for (Module *module : netlist->library)
+        if (module->name == _moduleType)
+            instance->instanceOf = module;
 
     if(!instance->instanceOf) {
         Module *dummy = new Module;
-        netlist.library.push_back(dummy);
+        netlist->library.push_back(dummy);
         dummy->name = type;
 
         instance->instanceOf = dummy;
@@ -352,54 +354,44 @@ bool verilog::VerilogReader::readModuleInstance(Netlist &netlist, Module *module
                 port->name = pins[i];
                 dummy->ports.push_back(port);
             }
+        if (!fillModulePortsInfoFromLEF(dummy))
+            return false;
     }
     ++instance->instanceOf->numberOfMyInstances;
 
     for (size_t i = 0; i < wires.size(); ++i) {
         size_t netIndex = 0;
-        for (netIndex = 0; netIndex < module->nets.size(); ++netIndex)
-            if (module->nets[netIndex]->name == wires[i])
+        for (netIndex = 0; netIndex < _module->nets.size(); ++netIndex)
+            if (_module->nets[netIndex]->name == wires[i])
                 break;
 
-        if (netIndex < module->nets.size())
-            instance->pins.push_back(module->nets[netIndex]);
+        if (netIndex < _module->nets.size())
+            instance->pins.push_back(_module->nets[netIndex]);
         else {
-            for (netIndex = 0; netIndex < module->ports.size(); ++netIndex)
-                if (module->ports[netIndex]->name == wires[i])
+            for (netIndex = 0; netIndex < _module->ports.size(); ++netIndex)
+                if (_module->ports[netIndex]->name == wires[i])
                     break;
-            if (netIndex == module->ports.size()) {
-                std::cerr << "  __err__ (" << line << ") : used net '" << wires[i] << "'wasn't found neither in nets nor ports of a module '" << module->name
+            if (netIndex == _module->ports.size()) {
+                std::cerr << "  __err__ (" << line << ") : used net '" << wires[i] << "'wasn't found neither in nets nor ports of a module '" << _module->name
                     << "'. Abort." << std::endl;
                 return false;
             }
-            instance->pins.push_back(module->ports[netIndex]);
+            instance->pins.push_back(_module->ports[netIndex]);
         }
-        
     }
 
     return true;
 }
 
-bool verilog::VerilogReader::performBasicChecks(Netlist &netlist) {
-    std::cout << "  Performing basic ckecks..." << std::endl;
-    for (int i = 0; i < netlist.library.size(); ++i) {
-        for(int j = 0; j < netlist.library[i]->instances.size(); ++j)
-            if (!netlist.library[i]->instances[j]->instanceOf)
-                std::cerr << "    __err__ : no base module found for instance " << netlist.library[i]->instances[j]->name 
-                          << " in module " << netlist.library[i]->name;
-    }
-    std::cout << "  Basic ckecks completed." << std::endl;
-    return true;
-}
-
-bool verilog::VerilogReader::findTopModule(Netlist &netlist) {
+bool verilog::VerilogReader::findTopModule() {
     std::vector<Module *> unusedCells;
-    for (size_t i = 0; i < netlist.library.size(); ++i)
-        if (!netlist.library[i]->numberOfMyInstances)
-            unusedCells.push_back(netlist.library[i]);
+
+    for (Module *module : netlist->library)
+        if (!module->numberOfMyInstances)
+            unusedCells.push_back(module);
 
     if (unusedCells.size() == 1) {
-        netlist.top = unusedCells[0];
+        netlist->top = unusedCells[0];
         return true;
     }
 
@@ -408,4 +400,79 @@ bool verilog::VerilogReader::findTopModule(Netlist &netlist) {
         std::cerr << "          * " << module->name << std::endl;
     std::cerr << "            I can't make a decision. Abort." << std::endl;
     return false;
+}
+
+bool verilog::VerilogReader::PostProcess() {
+    std::cout << "  Performing basic ckecks..." << std::endl;
+
+    if (!findTopModule())
+        return false;
+
+    for (Module *module : netlist->library) {
+        
+        for (Instance *instance : module->instances) {
+            if (!instance->instanceOf) {
+                std::cerr << "    __err__ : no base module found for instance " << instance->name
+                          << " in module " << module->name;
+                return false;
+            }
+            for(size_t i = 0; i < instance->pins.size(); ++i)
+                if (instance->instanceOf->ports[i]->direction == PortDirection::output ||
+                    instance->instanceOf->ports[i]->direction == PortDirection::inout) {
+                    if (instance->pins[i]->driver) {
+                        std::cerr << "  __wrn__ : net " << module->name << "." << instance->pins[i]->name << "already has driver!\n"
+                                  << "            It's driver is '" << instance->pins[i]->driver->name << ". Will be reassigned!\n";
+                    }
+                    instance->pins[i]->driver = instance;
+                }
+                else {
+                    instance->pins[i]->sourceFor.push_back(instance);
+                }
+        }
+        if (module == netlist->top)
+            continue;
+        for (Port *port : module->ports) {
+            if (port->direction == verilog::PortDirection::undefined) {
+                std::cerr << "    __err__ : found port (" << module->name << "." << port->name << ") with undefined direction. Abort.\n";
+                return false;
+            }
+        }
+    }
+
+    std::cout << "  Basic ckecks completed." << std::endl;
+    return true;
+}
+
+bool verilog::VerilogReader::fillModulePortsInfoFromLEF(Module *_module) {
+    lef::Macro *cell = lef->getMacroByName(_module->name);
+    if (!cell) {
+    //    if (_module->name != netlist->top->name) {
+            std::cerr << "  __err__ : Couldn't find LEF MACRO '" << _module->name << "' (module found in netlist)! Abort!\n";
+            return false;
+    //    }
+    //    continue;
+    }
+    for (verilog::Port *port : _module->ports) {
+        if (port->direction != verilog::PortDirection::undefined)
+            continue;
+        lef::Pin* pin = cell->getPinByName(port->name);
+        if (!pin) {
+            std::cerr << "  __err__ : Couldn't find pin '" << port->name << "' int LEF MACRO '" << cell->name << "' Abort!\n";
+            return false;
+        }
+        if (pin->direction == "INPUT") {
+            port->direction = verilog::PortDirection::input;
+            continue;
+        }
+        if (pin->direction == "OUTPUT") {
+            port->direction = verilog::PortDirection::output;
+            continue;
+        }
+        if (pin->direction == "INOUT") {
+            port->direction = verilog::PortDirection::inout;
+            continue;
+        }
+        std::cerr << "  __wrn__ : Unsupported MACRO PIN direction for cell '" << _module->name << "'. Ignore direction.\n";
+    }
+    return true;
 }

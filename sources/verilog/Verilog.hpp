@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "../def/DEF.hpp"
+
 namespace verilog {
 
     enum class NetType {
@@ -19,12 +21,14 @@ namespace verilog {
     };
 
     struct Module;
+    struct Instance;
 
     struct Net {
-        Module         *owner = nullptr;
-        bool            isPort = false;
-        std::string     name;
-        NetType         type = NetType::undefined;
+        Instance               *driver = nullptr;
+        std::vector<Instance *> sourceFor;
+        bool                    isPort = false;
+        std::string             name;
+        NetType                 type = NetType::undefined;
     };
 
     struct Port : public Net {
@@ -37,6 +41,11 @@ namespace verilog {
         Module                 *instanceOf = nullptr;
         std::string             name;
         std::vector<Net *>      pins;
+        struct {
+            def::COMPONENTS_class  *component  = nullptr;
+            int                     dx = 0,
+                                    dy = 0;
+        } placement;
     };
 
     struct Module {
@@ -51,6 +60,7 @@ namespace verilog {
         Net* getNetByName(const std::string &name);
         Port* getPortByName(const std::string &name);
         Instance* getInstanceByName(const std::string &name);
+        Instance* getInstanceByDEFName(const std::string &name);
         std::vector<Instance *>
             getInstancesByType(const std::string &typeName);
     };

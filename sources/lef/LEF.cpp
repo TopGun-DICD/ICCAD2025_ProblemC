@@ -36,6 +36,7 @@ void lef::LEFData::addMacro(Macro *_macro) {
 					  << "' already exists in macro collection.\n";
 			return;
 		}
+	macroes.push_back(_macro);
 }
 
 void lef::LEFData::addSite(Site *_site) {
@@ -49,6 +50,7 @@ void lef::LEFData::addSite(Site *_site) {
 					  << "' already exists in macro collection.\n";
 			return;
 		}
+	sites.push_back(_site);
 }
 
 lef::Macro* lef::LEFData::getMacroByName(const std::string &_name) {

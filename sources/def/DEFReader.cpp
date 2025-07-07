@@ -4,7 +4,7 @@
 
 #include "NoBoostSplit.hpp"
 
-bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def ) {
+bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, verilog::Netlist &netlist) {
     std::string buffer;
     std::vector<std::string> split_buffer;
     std::string BUS_DIV;
@@ -54,7 +54,7 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def )
             }
             if (split_buffer.front() == "COMPONENTS") {
                 def.COUNT_COMPONENTS = stoi(split_buffer[1]);
-                parseComponents(&inFile, def, &i);
+                parseComponents(&inFile, def, &i, netlist);
 
                 flagPaternov = 1;
             }
@@ -118,7 +118,7 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def )
 
 
 
-void def::DEFReader::parseComponents(std::ifstream* inFile, DEF_File& def, int* i) {
+void def::DEFReader::parseComponents(std::ifstream* inFile, DEF_File& def, int* i, verilog::Netlist &netlist) {
     std::string buffer;
     std::vector<std::string> split_buffer;
 
@@ -137,60 +137,65 @@ void def::DEFReader::parseComponents(std::ifstream* inFile, DEF_File& def, int* 
             }
 
             def.push_back_COMPONENTS(split_buffer[1], split_buffer[2]);
+            
+            verilog::Instance *instance = netlist.top->getInstanceByName(split_buffer[1]);
+            if (!instance)
+                instance = netlist.top->getInstanceByDEFName(split_buffer[1]);
+            instance->placement.component = def.COMPONENTS.back();
 
             for (const auto& word : split_buffer) {
                 if (word == "PLACED") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].FIXED = def::FIXED_class::PLACED;
+                    def.COMPONENTS.back()->FIXED = def::FIXED_class::PLACED;
                 }
                 if (word == "COVER") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].FIXED = FIXED_class::COVER;
+                    def.COMPONENTS.back()->FIXED = FIXED_class::COVER;
                 }
                 if (word == "UNPLACED") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].FIXED = FIXED_class::UNPLACED;
+                    def.COMPONENTS.back()->FIXED = FIXED_class::UNPLACED;
                 }
                 if (word == "FIXED") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].FIXED = FIXED_class::FIXED;
+                    def.COMPONENTS.back()->FIXED = FIXED_class::FIXED;
                 }
                 if (word == "NETLIST") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].SOURCE = SOURCE_class::NETLIST;
+                    def.COMPONENTS.back()->SOURCE = SOURCE_class::NETLIST;
                 }
                 if (word == "USER") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].SOURCE = SOURCE_class::USER;
+                    def.COMPONENTS.back()->SOURCE = SOURCE_class::USER;
                 }
                 if (word == "DIST") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].SOURCE = SOURCE_class::DIST;
+                    def.COMPONENTS.back()->SOURCE = SOURCE_class::DIST;
                 }
                 if (word == "TIMING") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].SOURCE = SOURCE_class::TIMING;
+                    def.COMPONENTS.back()->SOURCE = SOURCE_class::TIMING;
                 }
                 if (word == "(") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].POS.x = stoi(*(&word + 1));
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].POS.y = stoi(*(&word + 2));
+                    def.COMPONENTS.back()->POS.x = stoi(*(&word + 1));
+                    def.COMPONENTS.back()->POS.y = stoi(*(&word + 2));
                     //  ;
                 }
                 if (word == "N") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].POS.orientation = Orientation::N;
+                    def.COMPONENTS.back()->POS.orientation = Orientation::N;
                 }
                 if (word == "S") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].POS.orientation = Orientation::S;
+                    def.COMPONENTS.back()->POS.orientation = Orientation::S;
                 }
                 if (word == "E") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].POS.orientation = Orientation::E;
+                    def.COMPONENTS.back()->POS.orientation = Orientation::E;
                 }
                 if (word == "W") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].POS.orientation = Orientation::W;
+                    def.COMPONENTS.back()->POS.orientation = Orientation::W;
                 }
                 if (word == "FN") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].POS.orientation = Orientation::FN;
+                    def.COMPONENTS.back()->POS.orientation = Orientation::FN;
                 }
                 if (word == "FS") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].POS.orientation = Orientation::FS;
+                    def.COMPONENTS.back()->POS.orientation = Orientation::FS;
                 }
                 if (word == "FE") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].POS.orientation = Orientation::FE;
+                    def.COMPONENTS.back()->POS.orientation = Orientation::FE;
                 }
                 if (word == "FW") {
-                    def.COMPONENTS[def.COMPONENTS.size() - 1].POS.orientation = Orientation::FW;
+                    def.COMPONENTS.back()->POS.orientation = Orientation::FW;
                 }
 
 
@@ -218,28 +223,28 @@ void def::DEFReader::parseNets(std::ifstream* inFile, DEF_File& def, int* i) {
                 }
                 if (word == "USE") {
                     if (*(&word + 1) == "SIGNAL") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::SIGNAL;
+                        def.NETS.back()->USE = USE_class::SIGNAL;
                     }
                     if (*(&word + 1) == "POWER") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::POWER;
+                        def.NETS.back()->USE = USE_class::POWER;
                     }
                     if (*(&word + 1) == "GROUND") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::GROUND;
+                        def.NETS.back()->USE = USE_class::GROUND;
                     }
                     if (*(&word + 1) == "CLOCK") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::CLOCK;
+                        def.NETS.back()->USE = USE_class::CLOCK;
                     }
                     if (*(&word + 1) == "TIEOFF") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::TIEOFF;
+                        def.NETS.back()->USE = USE_class::TIEOFF;
                     }
                     if (*(&word + 1) == "ANALOG") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::ANALOG;
+                        def.NETS.back()->USE = USE_class::ANALOG;
                     }
                     if (*(&word + 1) == "SCAN") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::SCAN;
+                        def.NETS.back()->USE = USE_class::SCAN;
                     }
                     if (*(&word + 1) == "RESET") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::RESET;
+                        def.NETS.back()->USE = USE_class::RESET;
                     }
                 }
 
@@ -253,28 +258,28 @@ void def::DEFReader::parseNets(std::ifstream* inFile, DEF_File& def, int* i) {
                 }
                 if (word == "USE") {
                     if (*(&word + 1) == "SIGNAL") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::SIGNAL;
+                        def.NETS.back()->USE = USE_class::SIGNAL;
                     }
                     if (*(&word + 1) == "POWER") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::POWER;
+                        def.NETS.back()->USE = USE_class::POWER;
                     }
                     if (*(&word + 1) == "GROUND") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::GROUND;
+                        def.NETS.back()->USE = USE_class::GROUND;
                     }
                     if (*(&word + 1) == "CLOCK") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::CLOCK;
+                        def.NETS.back()->USE = USE_class::CLOCK;
                     }
                     if (*(&word + 1) == "TIEOFF") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::TIEOFF;
+                        def.NETS.back()->USE = USE_class::TIEOFF;
                     }
                     if (*(&word + 1) == "ANALOG") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::ANALOG;
+                        def.NETS.back()->USE = USE_class::ANALOG;
                     }
                     if (*(&word + 1) == "SCAN") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::SCAN;
+                        def.NETS.back()->USE = USE_class::SCAN;
                     }
                     if (*(&word + 1) == "RESET") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::RESET;
+                        def.NETS.back()->USE = USE_class::RESET;
                     }
                 }
             }
@@ -307,28 +312,28 @@ void def::DEFReader::parseSpecialnets(std::ifstream* inFile, DEF_File& def, int*
                 }
                 if (word == "USE") {
                     if (*(&word + 1) == "SIGNAL") {
-                        def.SPECIALNETS[def.SPECIALNETS.size() - 1].USE = USE_class::SIGNAL;
+                        def.SPECIALNETS.back()->USE = USE_class::SIGNAL;
                     }
                     if (*(&word + 1) == "POWER") {
-                        def.SPECIALNETS[def.SPECIALNETS.size() - 1].USE = USE_class::POWER;
+                        def.SPECIALNETS.back()->USE = USE_class::POWER;
                     }
                     if (*(&word + 1) == "GROUND") {
-                        def.SPECIALNETS[def.SPECIALNETS.size() - 1].USE = USE_class::GROUND;
+                        def.SPECIALNETS.back()->USE = USE_class::GROUND;
                     }
                     if (*(&word + 1) == "CLOCK") {
-                        def.SPECIALNETS[def.SPECIALNETS.size() - 1].USE = USE_class::CLOCK;
+                        def.SPECIALNETS.back()->USE = USE_class::CLOCK;
                     }
                     if (*(&word + 1) == "TIEOFF") {
-                        def.SPECIALNETS[def.SPECIALNETS.size() - 1].USE = USE_class::TIEOFF;
+                        def.SPECIALNETS.back()->USE = USE_class::TIEOFF;
                     }
                     if (*(&word + 1) == "ANALOG") {
-                        def.SPECIALNETS[def.SPECIALNETS.size() - 1].USE = USE_class::ANALOG;
+                        def.SPECIALNETS.back()->USE = USE_class::ANALOG;
                     }
                     if (*(&word + 1) == "SCAN") {
-                        def.SPECIALNETS[def.SPECIALNETS.size() - 1].USE = USE_class::SCAN;
+                        def.SPECIALNETS.back()->USE = USE_class::SCAN;
                     }
                     if (*(&word + 1) == "RESET") {
-                        def.SPECIALNETS[def.SPECIALNETS.size() - 1].USE = USE_class::RESET;
+                        def.SPECIALNETS.back()->USE = USE_class::RESET;
                     }
                 }
 
@@ -342,28 +347,28 @@ void def::DEFReader::parseSpecialnets(std::ifstream* inFile, DEF_File& def, int*
                 }
                 if (word == "USE") {
                     if (*(&word + 1) == "SIGNAL") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::SIGNAL;
+                        def.NETS.back()->USE = USE_class::SIGNAL;
                     }
                     if (*(&word + 1) == "POWER") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::POWER;
+                        def.NETS.back()->USE = USE_class::POWER;
                     }
                     if (*(&word + 1) == "GROUND") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::GROUND;
+                        def.NETS.back()->USE = USE_class::GROUND;
                     }
                     if (*(&word + 1) == "CLOCK") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::CLOCK;
+                        def.NETS.back()->USE = USE_class::CLOCK;
                     }
                     if (*(&word + 1) == "TIEOFF") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::TIEOFF;
+                        def.NETS.back()->USE = USE_class::TIEOFF;
                     }
                     if (*(&word + 1) == "ANALOG") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::ANALOG;
+                        def.NETS.back()->USE = USE_class::ANALOG;
                     }
                     if (*(&word + 1) == "SCAN") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::SCAN;
+                        def.NETS.back()->USE = USE_class::SCAN;
                     }
                     if (*(&word + 1) == "RESET") {
-                        def.NETS[def.NETS.size() - 1].USE = USE_class::RESET;
+                        def.NETS.back()->USE = USE_class::RESET;
                     }
                 }
             }
@@ -393,103 +398,103 @@ void def::DEFReader::parsePins(std::ifstream* inFile, DEF_File& def, int* i) {
 
         for (const auto& word : split_buffer) {
             if (word == "SPECIAL") {
-                def.PINS[def.PINS.size() - 1].SPECIAL = 1;
+                def.PINS.back()->SPECIAL = 1;
             }
             if (word == "DIRECTION") {
                 if (*(&word + 1) == "INPUT") {
-                    def.PINS[def.PINS.size() - 1].DIRECTION = DIRECTION_class::INPUT;
+                    def.PINS.back()->DIRECTION = DIRECTION_class::INPUT;
                 }
                 if (*(&word + 1) == "OUTPUT") {
-                    def.PINS[def.PINS.size() - 1].DIRECTION = DIRECTION_class::OUTPUT;
+                    def.PINS.back()->DIRECTION = DIRECTION_class::OUTPUT;
                 }
                 if (*(&word + 1) == "INOUT") {
-                    def.PINS[def.PINS.size() - 1].DIRECTION = DIRECTION_class::INOUT;
+                    def.PINS.back()->DIRECTION = DIRECTION_class::INOUT;
                 }
                 if (*(&word + 1) == "FEEDTHRU") {
-                    def.PINS[def.PINS.size() - 1].DIRECTION = DIRECTION_class::FEEDTHRU;
+                    def.PINS.back()->DIRECTION = DIRECTION_class::FEEDTHRU;
                 }
             }
 
             if (word == "USE") {
                 if (*(&word + 1) == "SIGNAL") {
-                    def.PINS[def.PINS.size() - 1].USE = USE_class::SIGNAL;
+                    def.PINS.back()->USE = USE_class::SIGNAL;
                 }
                 if (*(&word + 1) == "POWER") {
-                    def.PINS[def.PINS.size() - 1].USE = USE_class::POWER;
+                    def.PINS.back()->USE = USE_class::POWER;
                 }
                 if (*(&word + 1) == "GROUND") {
-                    def.PINS[def.PINS.size() - 1].USE = USE_class::GROUND;
+                    def.PINS.back()->USE = USE_class::GROUND;
                 }
                 if (*(&word + 1) == "CLOCK") {
-                    def.PINS[def.PINS.size() - 1].USE = USE_class::CLOCK;
+                    def.PINS.back()->USE = USE_class::CLOCK;
                 }
                 if (*(&word + 1) == "TIEOFF") {
-                    def.PINS[def.PINS.size() - 1].USE = USE_class::TIEOFF;
+                    def.PINS.back()->USE = USE_class::TIEOFF;
                 }
                 if (*(&word + 1) == "ANALOG") {
-                    def.PINS[def.PINS.size() - 1].USE = USE_class::ANALOG;
+                    def.PINS.back()->USE = USE_class::ANALOG;
                 }
                 if (*(&word + 1) == "SCAN") {
-                    def.PINS[def.PINS.size() - 1].USE = USE_class::SCAN;
+                    def.PINS.back()->USE = USE_class::SCAN;
                 }
                 if (*(&word + 1) == "RESET") {
-                    def.PINS[def.PINS.size() - 1].USE = USE_class::RESET;
+                    def.PINS.back()->USE = USE_class::RESET;
                 }
             }
             if (word == "LAYER") {
                 LAYER_class o;
-                def.PINS[def.PINS.size() - 1].LAYER.push_back(o);
-                def.PINS[def.PINS.size() - 1].LAYER[def.PINS[def.PINS.size() - 1].LAYER.size() - 1].layerName = (*(&word + 1));
-                def.PINS[def.PINS.size() - 1].LAYER[def.PINS[def.PINS.size() - 1].LAYER.size() - 1].rect.x1 = stoi(*(&word + 3));
-                def.PINS[def.PINS.size() - 1].LAYER[def.PINS[def.PINS.size() - 1].LAYER.size() - 1].rect.x2 = stoi(*(&word + 4));
-                def.PINS[def.PINS.size() - 1].LAYER[def.PINS[def.PINS.size() - 1].LAYER.size() - 1].rect.y1 = stoi(*(&word + 7));
-                def.PINS[def.PINS.size() - 1].LAYER[def.PINS[def.PINS.size() - 1].LAYER.size() - 1].rect.y2 = stoi(*(&word + 8));
+                def.PINS.back()->LAYER.push_back(o);
+                def.PINS.back()->LAYER[def.PINS.back()->LAYER.size() - 1].layerName = (*(&word + 1));
+                def.PINS.back()->LAYER[def.PINS.back()->LAYER.size() - 1].rect.x1 = stoi(*(&word + 3));
+                def.PINS.back()->LAYER[def.PINS.back()->LAYER.size() - 1].rect.x2 = stoi(*(&word + 4));
+                def.PINS.back()->LAYER[def.PINS.back()->LAYER.size() - 1].rect.y1 = stoi(*(&word + 7));
+                def.PINS.back()->LAYER[def.PINS.back()->LAYER.size() - 1].rect.y2 = stoi(*(&word + 8));
 
             }
 
             if (word == "PLACED") {
-                def.PINS[def.PINS.size() - 1].PLACED_PIN = FIXED_class::PLACED;
-                def.PINS[def.PINS.size() - 1].POS.x = stoi(*(&word + 2));
-                def.PINS[def.PINS.size() - 1].POS.y = stoi(*(&word + 3));
+                def.PINS.back()->PLACED_PIN = FIXED_class::PLACED;
+                def.PINS.back()->POS.x = stoi(*(&word + 2));
+                def.PINS.back()->POS.y = stoi(*(&word + 3));
             }
             if (word == "COVER") {
-                def.PINS[def.PINS.size() - 1].PLACED_PIN = FIXED_class::COVER;
-                def.PINS[def.PINS.size() - 1].POS.x = stoi(*(&word + 2));
-                def.PINS[def.PINS.size() - 1].POS.y = stoi(*(&word + 3));
+                def.PINS.back()->PLACED_PIN = FIXED_class::COVER;
+                def.PINS.back()->POS.x = stoi(*(&word + 2));
+                def.PINS.back()->POS.y = stoi(*(&word + 3));
             }
             if (word == "UNPLACED") {
-                def.PINS[def.PINS.size() - 1].PLACED_PIN = FIXED_class::UNPLACED;
-                def.PINS[def.PINS.size() - 1].POS.x = stoi(*(&word + 2));
-                def.PINS[def.PINS.size() - 1].POS.y = stoi(*(&word + 3));
+                def.PINS.back()->PLACED_PIN = FIXED_class::UNPLACED;
+                def.PINS.back()->POS.x = stoi(*(&word + 2));
+                def.PINS.back()->POS.y = stoi(*(&word + 3));
             }
             if (word == "FIXED") {
-                def.PINS[def.PINS.size() - 1].PLACED_PIN = FIXED_class::FIXED;
-                def.PINS[def.PINS.size() - 1].POS.x = stoi(*(&word + 2));
-                def.PINS[def.PINS.size() - 1].POS.y = stoi(*(&word + 3));
+                def.PINS.back()->PLACED_PIN = FIXED_class::FIXED;
+                def.PINS.back()->POS.x = stoi(*(&word + 2));
+                def.PINS.back()->POS.y = stoi(*(&word + 3));
             }
             if (word == "N") {
-                def.PINS[def.PINS.size() - 1].POS.orientation = Orientation::N;
+                def.PINS.back()->POS.orientation = Orientation::N;
             }
             if (word == "S") {
-                def.PINS[def.PINS.size() - 1].POS.orientation = Orientation::S;
+                def.PINS.back()->POS.orientation = Orientation::S;
             }
             if (word == "E") {
-                def.PINS[def.PINS.size() - 1].POS.orientation = Orientation::E;
+                def.PINS.back()->POS.orientation = Orientation::E;
             }
             if (word == "W") {
-                def.PINS[def.PINS.size() - 1].POS.orientation = Orientation::W;
+                def.PINS.back()->POS.orientation = Orientation::W;
             }
             if (word == "FN") {
-                def.PINS[def.PINS.size() - 1].POS.orientation = Orientation::FN;
+                def.PINS.back()->POS.orientation = Orientation::FN;
             }
             if (word == "FS") {
-                def.PINS[def.PINS.size() - 1].POS.orientation = Orientation::FS;
+                def.PINS.back()->POS.orientation = Orientation::FS;
             }
             if (word == "FE") {
-                def.PINS[def.PINS.size() - 1].POS.orientation = Orientation::FE;
+                def.PINS.back()->POS.orientation = Orientation::FE;
             }
             if (word == "FW") {
-                def.PINS[def.PINS.size() - 1].POS.orientation = Orientation::FW;
+                def.PINS.back()->POS.orientation = Orientation::FW;
             }
         }
 
@@ -554,7 +559,7 @@ void swup_comp(DEF_File* def, std::string name1, std::string name2) {
     int adr = 0;
     for (int o = 0; o < def.COMPONENTS.size(); o++) {
         if (def.COMPONENTS[o].compName == name1) {
-            buf.compName = def.COMPONENTS[o].compName;
+            buf.compName = def.C OMPONENTS[o].compName;
             buf.FIXED = def.COMPONENTS[o].FIXED;
             buf.modelName = def.COMPONENTS[o].modelName;
             buf.POS.x = def.COMPONENTS[o].POS.x;

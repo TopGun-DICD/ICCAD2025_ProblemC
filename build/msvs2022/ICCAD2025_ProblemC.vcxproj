@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\sources\algorithm\algorithm.cpp" />
     <ClCompile Include="..\..\sources\cmdline.cpp" />
     <ClCompile Include="..\..\sources\def\DEFReader.cpp" />
     <ClCompile Include="..\..\sources\def\DEFWriter.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="..\..\sources\verilog\VerilogReader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\sources\algorithm\algorithm.hpp" />
     <ClInclude Include="..\..\sources\cmdline.hpp" />
     <ClInclude Include="..\..\sources\def\DEF.hpp" />
     <ClInclude Include="..\..\sources\def\DEFReader.hpp" />
