@@ -37,6 +37,12 @@
     <Filter Include="Source Files\algorithm">
       <UniqueIdentifier>{4ab99651-82eb-4349-9fee-161fbab49d2c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\liberty">
+      <UniqueIdentifier>{541faddc-fb9f-49be-9852-9984233cd1e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\liberty">
+      <UniqueIdentifier>{eb55de04-d634-4d40-b04f-93178ecc056a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sources\main.cpp">
@@ -65,6 +71,12 @@
     </ClCompile>
     <ClCompile Include="..\..\sources\algorithm\algorithm.cpp">
       <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\liberty\Liberty.cpp">
+      <Filter>Source Files\liberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\liberty\LibertyReader.cpp">
+      <Filter>Source Files\liberty</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="..\..\sources\algorithm\algorithm.hpp">
       <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\liberty\Liberty.hpp">
+      <Filter>Header Files\liberty</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\liberty\LibertyReader.hpp">
+      <Filter>Header Files\liberty</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
