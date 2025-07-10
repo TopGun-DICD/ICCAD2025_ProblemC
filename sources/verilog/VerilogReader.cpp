@@ -201,6 +201,8 @@ bool verilog::VerilogReader::readModulePorts(Module *module) {
         readIdentifier(token);
         if (token[0] == ',')
             continue;
+        if (token[0] == ')')
+            break;
 
         Port *port = new Port;
         //port->owner     = module;
@@ -215,7 +217,7 @@ bool verilog::VerilogReader::readModulePorts(Module *module) {
     }
     if (posInCode >= codeLength)
         return false;
-    readToken(token);
+    readToken(token);   // ;
     return true;
 }
 
@@ -242,6 +244,40 @@ bool verilog::VerilogReader::readModulePortsOfDirection(Module *module, PortDire
             std::cerr << "  __wrn__ (" << line << "): in module '" << module->name << "' port '" << token << "' already has got its direction" 
                       << std::endl;
         module->ports[index]->direction = dir;
+    }
+    return true;
+}
+
+bool verilog::VerilogReader::fillModulePortsInfoFromLEF(Module* _module) {
+    lef::Macro *cell = lef->getMacroByName(_module->name);
+    if (!cell) {
+        //    if (_module->name != netlist->top->name) {
+        std::cerr << "  __err__ : Couldn't find LEF MACRO '" << _module->name << "' (module found in netlist)! Abort!\n";
+        return false;
+        //    }
+        //    continue;
+    }
+    for (verilog::Port* port : _module->ports) {
+        if (port->direction != verilog::PortDirection::undefined)
+            continue;
+        lef::Pin* pin = cell->getPinByName(port->name);
+        if (!pin) {
+            std::cerr << "  __err__ : Couldn't find pin '" << port->name << "' int LEF MACRO '" << cell->name << "' Abort!\n";
+            return false;
+        }
+        if (pin->direction == "INPUT") {
+            port->direction = verilog::PortDirection::input;
+            continue;
+        }
+        if (pin->direction == "OUTPUT") {
+            port->direction = verilog::PortDirection::output;
+            continue;
+        }
+        if (pin->direction == "INOUT") {
+            port->direction = verilog::PortDirection::inout;
+            continue;
+        }
+        std::cerr << "  __wrn__ : Unsupported MACRO PIN direction for cell '" << _module->name << "'. Ignore direction.\n";
     }
     return true;
 }
@@ -311,6 +347,7 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
         return false;
     }
 
+    // Читаеем порты экземпляра модуля
     while (true) {
         readIdentifier(token);
         if (token[0] == ',')
@@ -332,10 +369,12 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
     }
     readToken(token);
 
+    // Ищем модуль, типа которого наш компонент
     for (Module *module : netlist->library)
         if (module->name == _moduleType)
             instance->instanceOf = module;
 
+    // Если родительский модуль не найден - создадим новый и подгрузим данные о тего пинах из LEF
     if(!instance->instanceOf) {
         Module *dummy = new Module;
         netlist->library.push_back(dummy);
@@ -359,24 +398,94 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
     }
     ++instance->instanceOf->numberOfMyInstances;
 
+    // Выясним, какие из пинов экземпляра являются входными, а какие - выходными. Сделаем это на основе направления портов 
+    // родительского модуля
     for (size_t i = 0; i < wires.size(); ++i) {
+        // Сначала найдём цепь по имени подключаемого пина
         size_t netIndex = 0;
         for (netIndex = 0; netIndex < _module->nets.size(); ++netIndex)
             if (_module->nets[netIndex]->name == wires[i])
                 break;
 
+        // Цепь нашлась
         if (netIndex < _module->nets.size())
-            instance->pins.push_back(_module->nets[netIndex]);
+            // Задано ли ассоциативное назначение портов?
+            // Если да
+            if (!pins.empty()) {
+                //TODO: Необходимо проверить, что порт вообще нашёлся
+                for (Port *port : instance->instanceOf->ports) {
+                    if (port->name != pins[i])
+                        continue;
+                    switch (port->direction) {
+                        case PortDirection::input:
+                            instance->ins.push_back(_module->nets[netIndex]);
+                            break;
+                        case PortDirection::output:
+                        case PortDirection::inout:
+                            instance->outs.push_back(_module->nets[netIndex]);
+                            break;
+                        default:
+                            ; //TODO: std::cerr
+                    }
+                }
+            }
+            // Если нет
+            else {
+                switch (instance->instanceOf->ports[i]->direction) {
+                    case PortDirection::input:
+                        instance->ins.push_back(_module->nets[netIndex]);
+                        break;
+                    case PortDirection::output:
+                    case PortDirection::inout:
+                        instance->outs.push_back(_module->nets[netIndex]);
+                        break;
+                    default:
+                        ; //TODO: std::cerr
+                }
+            }
+
+        // Цепь не нашлась. Может это порт?
         else {
             for (netIndex = 0; netIndex < _module->ports.size(); ++netIndex)
                 if (_module->ports[netIndex]->name == wires[i])
                     break;
             if (netIndex == _module->ports.size()) {
-                std::cerr << "  __err__ (" << line << ") : used net '" << wires[i] << "'wasn't found neither in nets nor ports of a module '" << _module->name
-                    << "'. Abort." << std::endl;
+                std::cerr << "  __err__ (" << line << ") : used net '" << wires[i] << "'wasn't found neither in nets nor ports of a module '" 
+                          << _module->name << "'. Abort." << std::endl;
                 return false;
             }
-            instance->pins.push_back(_module->ports[netIndex]);
+            if (!pins.empty()) {
+                //TODO: Необходимо проверить, что порт вообще нашёлся
+                for (Port *port : instance->instanceOf->ports) {
+                    if (port->name != pins[i])
+                        continue;
+                    switch (port->direction) {
+                        case PortDirection::input:
+                            instance->ins.push_back(_module->ports[netIndex]);
+                            break;
+                        case PortDirection::output:
+                        case PortDirection::inout:
+                            instance->outs.push_back(_module->ports[netIndex]);
+                            break;
+                        default:
+                            ; //TODO: std::cerr
+                    }
+                }
+            }
+            // Если нет
+            else {
+                switch (instance->instanceOf->ports[i]->direction) {
+                case PortDirection::input:
+                    instance->ins.push_back(_module->ports[netIndex]);
+                    break;
+                case PortDirection::output:
+                case PortDirection::inout:
+                    instance->outs.push_back(_module->ports[netIndex]);
+                    break;
+                default:
+                    ; //TODO: std::cerr
+                }
+            }
         }
     }
 
@@ -408,6 +517,7 @@ bool verilog::VerilogReader::PostProcess() {
     if (!findTopModule())
         return false;
 
+    std::cout << "    Checking if any instance has no parent module...\n";
     for (Module *module : netlist->library) {
         
         for (Instance *instance : module->instances) {
@@ -416,7 +526,19 @@ bool verilog::VerilogReader::PostProcess() {
                           << " in module " << module->name;
                 return false;
             }
-            for(size_t i = 0; i < instance->pins.size(); ++i)
+            for (Net *net : instance->ins) {
+                net->sourceFor.push_back(instance);
+            }
+            for (Net *net : instance->outs) {
+                net->sourceFor.push_back(instance);
+                if (net->driver) {
+                    std::cerr << "  __wrn__ : net " << module->name << "." << net->name << "already has driver!\n"
+                              << "            It's driver is '" << net->driver->name << ". Will be reassigned!\n";
+                }
+                net->driver = instance;
+            }
+            /*
+            for (size_t i = 0; i < instance->pins.size(); ++i)
                 if (instance->instanceOf->ports[i]->direction == PortDirection::output ||
                     instance->instanceOf->ports[i]->direction == PortDirection::inout) {
                     if (instance->pins[i]->driver) {
@@ -428,6 +550,7 @@ bool verilog::VerilogReader::PostProcess() {
                 else {
                     instance->pins[i]->sourceFor.push_back(instance);
                 }
+            */
         }
         if (module == netlist->top)
             continue;
@@ -439,40 +562,51 @@ bool verilog::VerilogReader::PostProcess() {
         }
     }
 
+    std::cout << "    Checking Port directions for modules...\n";
+    for (Module *module : netlist->library) {
+        checkPortDirections(module);
+    }
+
     std::cout << "  Basic ckecks completed." << std::endl;
     return true;
 }
 
-bool verilog::VerilogReader::fillModulePortsInfoFromLEF(Module *_module) {
-    lef::Macro *cell = lef->getMacroByName(_module->name);
-    if (!cell) {
-    //    if (_module->name != netlist->top->name) {
-            std::cerr << "  __err__ : Couldn't find LEF MACRO '" << _module->name << "' (module found in netlist)! Abort!\n";
-            return false;
-    //    }
-    //    continue;
+bool verilog::VerilogReader::checkPortDirections(Module *_module) {
+    std::vector<Port *> undirectedPorts;
+    for (Port *port : _module->ports) {
+        if (port->direction != PortDirection::undefined)
+            continue;
+        undirectedPorts.push_back(port);
     }
-    for (verilog::Port *port : _module->ports) {
-        if (port->direction != verilog::PortDirection::undefined)
-            continue;
-        lef::Pin* pin = cell->getPinByName(port->name);
-        if (!pin) {
-            std::cerr << "  __err__ : Couldn't find pin '" << port->name << "' int LEF MACRO '" << cell->name << "' Abort!\n";
+
+    if (undirectedPorts.empty())
+        return true;
+
+    for (Port *port : undirectedPorts) {
+        bool portIsDirected = false;
+        for (Instance *instance : _module->instances) {
+            for (Net *pin : instance->ins)
+                if (pin->name == port->name) {
+                    port->direction = PortDirection::input;
+                    portIsDirected = true;
+                    break;
+                }
+            if (portIsDirected)
+                break;
+            for (Net *pin : instance->outs)
+                if (pin->name == port->name) {
+                    port->direction = PortDirection::output;
+                    portIsDirected = true;
+                    break;
+                }
+            if (portIsDirected)
+                break;
+        }
+        if (!portIsDirected) {
+            std::cerr << "    __err__ : Can't determine the direction if the port '" << port->name << "' in module '" 
+                      << _module->name << "'\n";
             return false;
         }
-        if (pin->direction == "INPUT") {
-            port->direction = verilog::PortDirection::input;
-            continue;
-        }
-        if (pin->direction == "OUTPUT") {
-            port->direction = verilog::PortDirection::output;
-            continue;
-        }
-        if (pin->direction == "INOUT") {
-            port->direction = verilog::PortDirection::inout;
-            continue;
-        }
-        std::cerr << "  __wrn__ : Unsupported MACRO PIN direction for cell '" << _module->name << "'. Ignore direction.\n";
     }
     return true;
 }

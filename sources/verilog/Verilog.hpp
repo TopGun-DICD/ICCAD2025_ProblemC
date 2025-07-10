@@ -40,11 +40,14 @@ namespace verilog {
     struct Instance {
         Module                 *instanceOf = nullptr;
         std::string             name;
-        std::vector<Net *>      pins;
+        std::vector<Net *>      ins,
+                                outs,
+                                unknown;
         struct {
             def::COMPONENTS_class  *component  = nullptr;
-            int                     dx = 0,
-                                    dy = 0;
+            int                     dx  = 0,    
+                                    dy  = 0;
+            uint64_t                sum = 0;
         } placement;
     };
 

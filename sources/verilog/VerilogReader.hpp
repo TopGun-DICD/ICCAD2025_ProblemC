@@ -28,11 +28,12 @@ namespace verilog {
         bool readModule();
         bool readModulePorts(Module *_module);
         bool readModulePortsOfDirection(Module *_module, PortDirection _dir);
+        bool fillModulePortsInfoFromLEF(Module *_module);
         bool readModuleNetsOfType(Module *_module, NetType _type);
         bool readModuleInstance(Module *_module, const char *_moduleType);
         bool PostProcess();
         bool findTopModule();
-        bool fillModulePortsInfoFromLEF(Module *_module);
+        bool checkPortDirections(Module *_module);
     };
 
 }
