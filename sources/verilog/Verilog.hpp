@@ -45,10 +45,16 @@ namespace verilog {
                                 unknown;
         struct {
             def::COMPONENTS_class  *component  = nullptr;
-            int                     dx  = 0,    
-                                    dy  = 0;
-            uint64_t                sum = 0;
+            std::vector<int>        dx,                 // по входам - по числу входов - расстояние до предыдущего компонента по X
+                                    dy;                 // по входам - по числу входов - расстояние до предыдущего компонента по Y
+            int                     sum = 0,            // по входам - суммарное расстояние dx + dy по всем входам
+                                    sumNormalized = 0,  // по входам - нормализованное на число входов суммарное расстояние по всем входам
+                                    radius = 0;         // по выходам - радиус - расстояние досамого дальнего компонента по выходу
+            def::Position           massCenter;         // по входам - "центр масс" входных элементов данного модуля
         } placement;
+
+    public:
+        void recalcPlacementParameters();
     };
 
     struct Module {

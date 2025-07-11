@@ -195,7 +195,6 @@ bool verilog::VerilogReader::readModule() {
 
 bool verilog::VerilogReader::readModulePorts(Module *module) {
     char token[MAX_TOKEN_LENGTH] = { 0 };
-
     
     while (strcmp(token, ")") && posInCode < codeLength) {
         readIdentifier(token);
@@ -488,6 +487,9 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
             }
         }
     }
+    
+    instance->placement.dx.resize(instance->ins.size());
+    instance->placement.dy.resize(instance->ins.size());
 
     return true;
 }
@@ -537,20 +539,6 @@ bool verilog::VerilogReader::PostProcess() {
                 }
                 net->driver = instance;
             }
-            /*
-            for (size_t i = 0; i < instance->pins.size(); ++i)
-                if (instance->instanceOf->ports[i]->direction == PortDirection::output ||
-                    instance->instanceOf->ports[i]->direction == PortDirection::inout) {
-                    if (instance->pins[i]->driver) {
-                        std::cerr << "  __wrn__ : net " << module->name << "." << instance->pins[i]->name << "already has driver!\n"
-                                  << "            It's driver is '" << instance->pins[i]->driver->name << ". Will be reassigned!\n";
-                    }
-                    instance->pins[i]->driver = instance;
-                }
-                else {
-                    instance->pins[i]->sourceFor.push_back(instance);
-                }
-            */
         }
         if (module == netlist->top)
             continue;
@@ -563,15 +551,20 @@ bool verilog::VerilogReader::PostProcess() {
     }
 
     std::cout << "    Checking Port directions for modules...\n";
-    for (Module *module : netlist->library) {
-        checkPortDirections(module);
-    }
+    for (Module *module : netlist->library)
+        if (!checkModulePortDirections(module))
+            return false;
+
+    std::cout << "    Prepare internal data for the algorithms...\n";
+    for (Module *module : netlist->library)
+        for (Instance *instance : module->instances)
+            instance->recalcPlacementParameters();
 
     std::cout << "  Basic ckecks completed." << std::endl;
     return true;
 }
 
-bool verilog::VerilogReader::checkPortDirections(Module *_module) {
+bool verilog::VerilogReader::checkModulePortDirections(Module *_module) {
     std::vector<Port *> undirectedPorts;
     for (Port *port : _module->ports) {
         if (port->direction != PortDirection::undefined)

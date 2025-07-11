@@ -33,7 +33,7 @@ namespace verilog {
         bool readModuleInstance(Module *_module, const char *_moduleType);
         bool PostProcess();
         bool findTopModule();
-        bool checkPortDirections(Module *_module);
+        bool checkModulePortDirections(Module *_module);
     };
 
 }

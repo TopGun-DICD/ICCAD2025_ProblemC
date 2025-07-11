@@ -4,6 +4,34 @@ verilog::Port::Port() {
     isPort = true; 
 }
 
+void verilog::Instance::recalcPlacementParameters() {
+    placement.sum = 0;
+    int sumX = 0, 
+        sumY = 0;
+    for (size_t i = 0; i < ins.size(); ++i) {
+        placement.dx[i] = placement.component->POS.x - ins[i]->driver->placement.component->POS.x;
+        placement.dy[i] = placement.component->POS.y - ins[i]->driver->placement.component->POS.y;
+        placement.sum += placement.dx[i] + placement.dy[i];
+        sumX += ins[i]->driver->placement.component->POS.x;
+        sumY += ins[i]->driver->placement.component->POS.y;
+    }
+    placement.sumNormalized = placement.sum / static_cast<int>(ins.size());
+    placement.massCenter.x = sumX / static_cast<int>(ins.size());
+    placement.massCenter.y = sumY / static_cast<int>(ins.size());
+
+    double  max_radius = 0.0,
+            radius = 0.0;
+    for (size_t i = 0; i < outs.size(); ++i)
+        for (size_t j = 0; j < outs[i]->sourceFor.size(); ++j) {
+            double dx = static_cast<double>(outs[i]->sourceFor[j]->placement.component->POS.x - placement.component->POS.x);
+            double dy = static_cast<double>(outs[i]->sourceFor[j]->placement.component->POS.y - placement.component->POS.y);
+            radius = sqrt(dx*dx + dy*dy);
+            if (radius > max_radius)
+                max_radius = radius;
+        }
+    placement.radius = static_cast<uint32_t>(max_radius);
+}
+
 verilog::Module::~Module() {
     for (auto *net : nets)
         delete net;
