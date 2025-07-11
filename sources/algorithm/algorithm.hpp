@@ -3,11 +3,17 @@
 #include "../def/DEF.hpp"
 #include "../lef/LEF.hpp"
 #include "../verilog/Verilog.hpp"
+#include "CellReplacer.hpp"
+#include "FanoutAnalyzer.hpp"
 
 class Algorithm {
     verilog::Netlist   &netlist;
     lef::LEFData       &lef;
     def::DEF_File      &def;
+
+    FanoutAnalyzer fanoutAnalyzer;
+    CellReplacer cellReplacer;
+
 public:
     Algorithm(verilog::Netlist &_netlist, lef::LEFData &_lef, def::DEF_File &_def);
 public:

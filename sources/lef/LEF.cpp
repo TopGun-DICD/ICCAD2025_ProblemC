@@ -66,3 +66,12 @@ lef::Site* lef::LEFData::getSiteByName(const std::string &_name) {
 			return site;
 	return nullptr;
 }
+
+std::pair<double, double> lef::LEFData::getMacroSize(const std::string &_name) const {
+	for (auto* macro : macroes) {
+		if (macro->name == _name) {
+			return { macro->sizeX, macro->sizeY };
+		}
+	}
+	return { 0.0, 0.0 };
+}

@@ -70,6 +70,10 @@ public:
     void addSite(Site *_site);
     Macro* getMacroByName(const std::string &_name);
     Site* getSiteByName(const std::string &_name);
+
+    const std::vector<Macro*>& getMacroes() const { return macroes; }
+
+    std::pair<double, double> getMacroSize(const std::string &_name) const; 
 };
 
 }

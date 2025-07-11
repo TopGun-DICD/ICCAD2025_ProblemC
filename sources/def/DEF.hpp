@@ -239,7 +239,7 @@ public:
         }
         return nullptr;
     }
-
+    const std::vector<COMPONENTS_class*>& get_all_component() const { return COMPONENTS; }
 };
 
 }
