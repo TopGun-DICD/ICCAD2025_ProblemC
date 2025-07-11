@@ -20,6 +20,7 @@ namespace verilog {
         ~VerilogReader();
     public:
         bool read(const std::string &_fname, Netlist &_netlist, lef::LEFData &_lef);
+        void postProcessAfterDEF();
     private:
         bool readHDLCode(const std::string &_fname);
         void readToken(char *_token);
@@ -31,7 +32,7 @@ namespace verilog {
         bool fillModulePortsInfoFromLEF(Module *_module);
         bool readModuleNetsOfType(Module *_module, NetType _type);
         bool readModuleInstance(Module *_module, const char *_moduleType);
-        bool PostProcess();
+        bool postProcess();
         bool findTopModule();
         bool checkModulePortDirections(Module *_module);
     };

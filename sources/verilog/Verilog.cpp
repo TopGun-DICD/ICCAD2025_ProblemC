@@ -9,6 +9,8 @@ void verilog::Instance::recalcPlacementParameters() {
     int sumX = 0, 
         sumY = 0;
     for (size_t i = 0; i < ins.size(); ++i) {
+        if (!ins[i]->driver)
+            continue;
         placement.dx[i] = placement.component->POS.x - ins[i]->driver->placement.component->POS.x;
         placement.dy[i] = placement.component->POS.y - ins[i]->driver->placement.component->POS.y;
         placement.sum += placement.dx[i] + placement.dy[i];

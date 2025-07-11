@@ -47,9 +47,16 @@ bool verilog::VerilogReader::read(const std::string &_fname, Netlist &_netlist, 
 
     netlist->fileName = _fname;
 
-    PostProcess();
+    postProcess();
 
     return true;
+}
+
+void verilog::VerilogReader::postProcessAfterDEF() {
+    for (Module *module : netlist->library)
+        for (Instance *instance : module->instances)
+            instance->recalcPlacementParameters();
+
 }
 
 bool verilog::VerilogReader::readHDLCode(const std::string &fname) {
@@ -488,8 +495,8 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
         }
     }
     
-    instance->placement.dx.resize(instance->ins.size());
-    instance->placement.dy.resize(instance->ins.size());
+    instance->placement.dx.resize(instance->ins.size(), 0);
+    instance->placement.dy.resize(instance->ins.size(), 0);
 
     return true;
 }
@@ -513,7 +520,7 @@ bool verilog::VerilogReader::findTopModule() {
     return false;
 }
 
-bool verilog::VerilogReader::PostProcess() {
+bool verilog::VerilogReader::postProcess() {
     std::cout << "  Performing basic ckecks..." << std::endl;
 
     if (!findTopModule())
@@ -554,11 +561,6 @@ bool verilog::VerilogReader::PostProcess() {
     for (Module *module : netlist->library)
         if (!checkModulePortDirections(module))
             return false;
-
-    std::cout << "    Prepare internal data for the algorithms...\n";
-    for (Module *module : netlist->library)
-        for (Instance *instance : module->instances)
-            instance->recalcPlacementParameters();
 
     std::cout << "  Basic ckecks completed." << std::endl;
     return true;
