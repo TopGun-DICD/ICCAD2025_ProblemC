@@ -56,6 +56,9 @@ int main(int argc, char* argv[]) {
     std::cout << "Done reading input DEF file. File has been read in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
     //*/
 
+    std::cout << "Prepare internal data for the algorithms...\n\n";
+    verilogReader.postProcessAfterDEF();
+
     // Process the data...
     Algorithm algorithm(netlist, lef, def);
 

@@ -287,11 +287,3 @@ void lef::LEF_READER::parseSite(std::ifstream& file, const std::string& name, LE
     lefs.addSite(site);
 }
 
-/*
-void lef::LEF_READER::clear() {
-    for (auto macro : macros) delete macro;
-    for (auto site : sites) delete site;
-    macros.clear();
-    sites.clear();
-}
-*/
