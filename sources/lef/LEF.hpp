@@ -74,6 +74,8 @@ public:
     const std::vector<Macro*>& getMacroes() const { return macroes; }
 
     std::pair<double, double> getMacroSize(const std::string &_name) const; 
+    std::pair<double, double> getScaledMacroSize(const std::string& cellName) const;
+    const double LEF_TO_DEF_SCALE = 1000.0;
 };
 
 }

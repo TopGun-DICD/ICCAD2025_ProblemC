@@ -6,9 +6,9 @@ void FanoutAnalyzer::analyzeFanout(verilog::Netlist& netlist) {
     if (!netlist.top) return;
 
     for (auto* instance : netlist.top->instances) {
-        for (size_t i = 0; i < instance->pins.size(); ++i) {
+        for (size_t i = 0; i < instance->ins.size(); ++i) {
             if (instance->instanceOf->ports[i]->direction == verilog::PortDirection::output) {
-                fanoutCounts[instance->name] += instance->pins[i]->sourceFor.size();
+                fanoutCounts[instance->name] += instance->ins[i]->sourceFor.size();
             }
         }
     }

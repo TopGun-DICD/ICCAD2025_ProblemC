@@ -75,3 +75,8 @@ std::pair<double, double> lef::LEFData::getMacroSize(const std::string &_name) c
 	}
 	return { 0.0, 0.0 };
 }
+
+std::pair<double, double> lef::LEFData::getScaledMacroSize(const std::string &_name) const {
+	auto size = LEFData::getMacroSize(_name);
+	return { size.first * LEF_TO_DEF_SCALE, size.second * LEF_TO_DEF_SCALE };
+}
