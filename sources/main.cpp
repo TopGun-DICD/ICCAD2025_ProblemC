@@ -62,16 +62,17 @@ int main(int argc, char* argv[]) {
     //*
     std::cout << "Reading input Liberty files, " << cmdLine.libs.size() << " files to read.\n";
     liberty::Liberty        liberty;
-    liberty::LibertyReader  lib_reader;
+    liberty::LibertyReader  libReader;
     for (const auto &lib_file : cmdLine.libs) {
         std::cout << "  * Reading file '" << lib_file << "'...\n";
         timeStart = std::clock();
-        if (!lib_reader.read(lib_file, liberty, netlist))
+        if (!libReader.read(lib_file, liberty, netlist))
             return EXIT_FAILURE;
         timeStop = std::clock() - timeStart;
         timeSum += timeStop;
         std::cout << "    Done in " << printTimeStatistics(timeStart, timeStop) << "\n";
     }
+    libReader.postProcessAfterAll();
     std::cout << "Done reading " << cmdLine.lefs.size() << " Liberty files. It took " << printTimeStatistics(0, timeSum) << " in total\n\n";
     //*/
 
@@ -87,7 +88,7 @@ int main(int argc, char* argv[]) {
     timeStop = std::clock() - timeStart;
     std::cout << "Step 1 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
 
-    std::cout << "Algoritm : performing step 3...\n";
+    std::cout << "Algoritm : performing step 2...\n";
     timeStart = std::clock();
     algorithm.step_2_MoveCells();
     timeStop = std::clock() - timeStart;

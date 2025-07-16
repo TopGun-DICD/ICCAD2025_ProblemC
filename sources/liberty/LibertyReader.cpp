@@ -43,8 +43,6 @@ bool liberty::LibertyReader::read(const std::string &_fname, Liberty &_liberty, 
 
     liberty->fileName = _fname;
 
-    postProcess();
-
     return true;
 }
 
@@ -260,6 +258,18 @@ bool liberty::LibertyReader::readCell(Library *library) {
                 return false;
             continue;
         }
+        if (!strcmp(token, "ff")) {
+            readUntil('}');
+            continue;
+        }
+        if (!strcmp(token, "latch")) {
+            readUntil('}');
+            continue;
+        }
+        if (!strcmp(token, "statetable")) {
+            readUntil('}');
+            continue;
+        }
         if (token[0] == '}') {
             break;
         }
@@ -286,15 +296,26 @@ bool liberty::LibertyReader::readPin(Cell *_cell) {
         if (!strcmp(token, "direction")) {
             readToken(token);   // :
             readToken(token);
-            if (!strcmp(token, "input"))
+            if (!strcmp(token, "input")) {
+                pin->direction = PinDirection::input;
                 _cell->ins.push_back(pin);
+            }
             else
-                if (!strcmp(token, "output"))
+                if (!strcmp(token, "output")) {
+                    pin->direction = PinDirection::output;
                     _cell->outs.push_back(pin);
-                else {
-                    std::cerr << "__err__ : unsupported pin direction '" << token << "' for pin '" << pin->name 
-                              << "' of cell '" << _cell->name << "'\n. Abort reading liberty file.";
-                    return false;
+                }
+                else 
+                    if (!strcmp(token, "internal")) {
+                        delete pin;
+                        pin = nullptr;
+                        readUntil('}');
+                        return true;
+                    }
+                    else {
+                        std::cerr << "__err__ : unsupported pin direction '" << token << "' for pin '" << pin->name 
+                                  << "' of cell '" << _cell->name << "'\n. Abort reading liberty file.";
+                        return false;
                 }
             readToken(token);   // ;
             continue;
@@ -327,15 +348,31 @@ bool liberty::LibertyReader::readPin(Cell *_cell) {
     return true;
 }
 
-bool liberty::LibertyReader::postProcess() {
+bool liberty::LibertyReader::postProcessAfterAll() {
     for (verilog::Module *module : netlist->library)
         for (verilog::Instance *instance : module->instances) {
             for(Library *library : liberty->libraries)
                 for (Cell *cell : library->cells) {
-                    if (cell->name == instance->instanceOf->name)
+                    if (instance->instanceOf->name == cell->name) {
                         instance->libertyCell = cell;
+
+                        if(instance->ins.size() != cell->ins.size()) {
+                            std::cerr << "  __wrn__ : Number of verilog instance's input pins is not equal to the number of liberty cell input pins"
+                                      " for cell '" << instance->name << "' (instance of '" << instance->instanceOf->name << "')\n";
+                            continue;
+                        }
+                        for (size_t i = 0; i < instance->ins.size(); ++i)
+                            instance->libertyIns.push_back(cell->ins[i]);
+                        for (size_t i = 0; i < instance->outs.size(); ++i)
+                            instance->libertyOuts.push_back(cell->outs[i]);
+                    }
                 }
+            if (!instance->libertyCell) {
+                std::cerr << "  __wrn__ : Coul'd find any liberty cell with the name '" << instance->instanceOf->name << "'.\n";
+                continue;
+            }
         }
+
     return true;
 }
 

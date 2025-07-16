@@ -18,6 +18,7 @@ namespace liberty {
        ~LibertyReader();
     public:
         bool read(const std::string &_fname, Liberty &_liberty, verilog::Netlist &_netlist);
+        bool postProcessAfterAll();
     private:
         bool readCode(const std::string &_fname);
         void readToken(char *_token);
@@ -30,7 +31,6 @@ namespace liberty {
         bool readCell(Library *_library);
         bool readPin(Cell *_cell);
 
-        bool postProcess();
     };
 
 }
