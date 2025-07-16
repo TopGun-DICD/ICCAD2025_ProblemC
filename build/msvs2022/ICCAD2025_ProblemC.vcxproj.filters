@@ -66,6 +66,9 @@
     <ClCompile Include="..\..\sources\algorithm\algorithm.cpp">
       <Filter>Source Files\algorithm</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sources\step_1_SwapCells.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sources\cmdline.hpp">
@@ -97,6 +100,9 @@
     </ClInclude>
     <ClInclude Include="..\..\sources\algorithm\algorithm.hpp">
       <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\step_1_SwapCells.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
