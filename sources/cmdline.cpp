@@ -13,7 +13,7 @@
 #define ENABLE_VERILOG_READING
 #define ENABLE_LEF_READING
 #define ENABLE_DEF_READING
-//#define ENABLE_LIB_READING
+#define ENABLE_LIB_READING
 
 bool CmdLine::parse(int argc, char *argv[]) {
     std::cout << "ICCAD 2025 TaskC solver [team cadc1079]\n\n";

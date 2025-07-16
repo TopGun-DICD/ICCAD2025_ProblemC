@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../def/DEF.hpp"
+#include "../liberty/Liberty.hpp"
 
 namespace verilog {
 
@@ -52,6 +53,8 @@ namespace verilog {
                                     radius = 0;         // по выходам - радиус - расстояние досамого дальнего компонента по выходу
             def::Position           massCenter;         // по входам - "центр масс" входных элементов данного модуля
         } placement;
+        liberty::Cell          *libertyCell = nullptr;
+
 
     public:
         void recalcPlacementParameters();
