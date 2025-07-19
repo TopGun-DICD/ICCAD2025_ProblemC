@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../def/DEF.hpp"
+#include "../liberty/Liberty.hpp"
 
 namespace verilog {
 
@@ -24,11 +25,11 @@ namespace verilog {
     struct Instance;
 
     struct Net {
-        Instance               *driver = nullptr;
-        std::vector<Instance *> sourceFor;
-        bool                    isPort = false;
-        std::string             name;
-        NetType                 type = NetType::undefined;
+        Instance                   *driver = nullptr;
+        std::vector<Instance *>     sourceFor;
+        bool                        isPort = false;
+        std::string                 name;
+        NetType                     type = NetType::undefined;
     };
 
     struct Port : public Net {
@@ -38,11 +39,13 @@ namespace verilog {
     };
 
     struct Instance {
-        Module                 *instanceOf = nullptr;
-        std::string             name;
-        std::vector<Net *>      ins,
-                                outs,
-                                unknown;
+        Module                     *instanceOf = nullptr;
+        std::string                 name;
+        std::vector<Net *>          ins,
+                                    outs,
+                                    unknown;
+        std::vector<liberty::Pin *> libertyIns,
+                                    libertyOuts;
         struct {
             def::COMPONENTS_class  *component  = nullptr;
             std::vector<int>        dx,                 // по входам - по числу входов - расстояние до предыдущего компонента по X
@@ -52,6 +55,8 @@ namespace verilog {
                                     radius = 0;         // по выходам - радиус - расстояние досамого дальнего компонента по выходу
             def::Position           massCenter;         // по входам - "центр масс" входных элементов данного модуля
         } placement;
+        liberty::Cell              *libertyCell = nullptr;
+
 
     public:
         void recalcPlacementParameters();

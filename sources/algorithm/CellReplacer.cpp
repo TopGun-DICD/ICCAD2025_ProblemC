@@ -2,81 +2,157 @@
 
 CellReplacer::CellReplacer(lef::LEFData& lefData) : lefData(lefData) {}
 
-void CellReplacer::replaceCellsBasedOnFanout(verilog::Netlist& netlist,const std::unordered_map<std::string, int>& fanoutCounts,def::DEF_File& defFile) {
-
+void CellReplacer::replaceCellsBasedOnCapacitance(verilog::Netlist& netlist,const liberty::Liberty& liberty,const std::unordered_map<std::string, double>& capacitanceMap,def::DEF_File& defFile) {
     const auto rows = analyzeRows(defFile);
 
-    for (const auto& [instanceName, fanout] : fanoutCounts) {
-
+    for (const auto& [instanceName, maxCapacitance] : capacitanceMap) {
         auto* defComponent = defFile.get_component(instanceName);
         if (!defComponent) continue;
 
-        std::string originalCell = defComponent->modelName;
+        auto* instance = netlist.top->getInstanceByName(instanceName);
+        if (!instance || !instance->libertyCell) continue;
 
-        auto [baseCell,driveStr, suffix] = parseCellName(originalCell);
+        std::string originalCell = defComponent->modelName;
+        auto [baseCell, driveStr, suffix] = parseCellName(originalCell);
 
         std::vector<std::string> variants = findCellVariantsInLEF(baseCell, suffix);
+
         if (variants.empty()) continue;
-
-        std::string newCell = selectOptimalVariant(variants, fanout, originalCell);
-
-        if (newCell == originalCell) continue;
-
-        const auto OldSize = lefData.getScaledMacroSize(originalCell);
-        const auto NewSize = lefData.getScaledMacroSize(newCell);
-
-        bool PlacementSuccess = false;
-
-        auto currentRowIt = std::find_if(rows.begin(), rows.end(),
-            [defComponent](const RowInfo& r) { return r.y == defComponent->POS.y; });
-
-        if (currentRowIt != rows.end()) {
       
-            if (canPlaceInRow(const_cast<RowInfo&>(*currentRowIt), defComponent, NewSize)) {
-                PlacementSuccess = true;
-            }
+        double originalMaxCap = getMaxOutputCapacitance(instance->libertyCell);
 
-            else if (tryMoveToAdjacentRow(defFile, defComponent, NewSize, rows)) {
-                PlacementSuccess = true;
+        //std::cout << "\nChecking instance: " << instanceName << std::endl;
+        //std::cout << "Current cell: " << originalCell << " (max cap: " << originalMaxCap << ")" << std::endl;
+        //std::cout << "Required max capacitance: " << maxCapacitance << std::endl;
+
+        if (maxCapacitance <= originalMaxCap) continue;
+        
+        std::string bestReplacement;
+        double bestCap = originalMaxCap;
+        std::pair<double, double> bestSize;
+
+        for (const auto& variant : variants) {
+            if (variant == originalCell) continue;
+
+            liberty::Cell* variantCell = findLibertyCell(liberty, variant);
+            if (!variantCell) continue;
+            
+
+            double variantCap = getMaxOutputCapacitance(variantCell);
+            auto variantSize = lefData.getScaledMacroSize(variant);
+
+            //std::cout << "Evaluating variant " << variant<< " (cap: " << variantCap << ", size: "<< variantSize.first << "x" << variantSize.second << ")" << std::endl;
+
+            if (variantCap >= maxCapacitance) {
+                if (bestReplacement.empty() || variantCap < bestCap) {
+                    bestReplacement = variant;
+                    bestCap = variantCap;
+                    bestSize = variantSize;
+                }
             }
         }
 
-        if (PlacementSuccess) {
-            defComponent->modelName = newCell;
-            updateDEFComponent(defFile, defComponent, originalCell, newCell, fanout);
+        if (bestReplacement.empty()) {
+            //std::cout << "No suitable variant found with higher capacitance." << std::endl;
+            continue;
+        }
+
+        //std::cout << "Selected replacement: " << bestReplacement<< " (cap: " << bestCap << ")" << std::endl;
+
+        bool placementSuccess = false;
+        auto currentRowIt = std::find_if(rows.begin(), rows.end(),[defComponent](const RowInfo& r) { return r.y == defComponent->POS.y; });
+
+        if (currentRowIt != rows.end()) {
+            if (canPlaceInRow(const_cast<RowInfo&>(*currentRowIt), defComponent, bestSize)) {
+                placementSuccess = true;
+                //std::cout << "Can place in current row." << std::endl;
+            }
+            else if (tryMoveToAdjacentRow(defFile, defComponent, bestSize, rows)) {
+                placementSuccess = true;
+                //std::cout << "Moved to adjacent row." << std::endl;
+            }
+        }
+
+        if (placementSuccess) {
+            defComponent->modelName = bestReplacement;
+            updateDEFComponent(defFile, defComponent, originalCell, bestReplacement, maxCapacitance);
+            //std::cout << "Successfully replaced " << originalCell<< " with " << bestReplacement << std::endl;
+        }
+        else {
+            //std::cout << "Could not place replacement cell " << bestReplacement << std::endl;
         }
     }
     compactLayout(defFile);
 }
 
-std::tuple<std::string,int, std::string> CellReplacer::parseCellName(const std::string& cellName) {
-
-    std::regex basePattern(R"((\w+?)x(\d+)?(_\w+)?$)");
-    std::smatch matches;
-    if (std::regex_search(cellName, matches, basePattern)) {
-        int drive = 0;
-        if (matches[2].matched) {
-            drive = std::stoi(matches[2].str());
+liberty::Cell* CellReplacer::findLibertyCell(const liberty::Liberty& liberty, const std::string& cellName) {
+    for (auto* lib : liberty.libraries) {
+        for (auto* cell : lib->cells) {
+            if (cell->name == cellName) {
+                return cell;
+            }
         }
-        return { matches[1].str(), drive, matches[3].str() };
     }
-    return { cellName, 0, "" };
+    return nullptr;
+}
+
+double CellReplacer::getMaxOutputCapacitance(const liberty::Cell* cell) {
+    if (!cell) return 0.0;
+    
+    if (cell->outs.empty()) return 0.0;
+
+    double maxCap = 0.0;
+    for (auto* outPin : cell->outs) {
+        if (outPin->capacitance > maxCap) {
+            maxCap = outPin->capacitance;
+        }
+    }
+    return maxCap;
+}
+
+std::tuple<std::string, std::string, std::string> CellReplacer::parseCellName(const std::string& cellName) {
+
+    std::regex basePattern(R"((\w+?)x(\d+)_(ASAP7_\d+t_\w+))");
+    std::regex xpPattern(R"((\w+?)xp(\d+)_(ASAP7_\d+t_\w+))");
+    std::regex simplePattern(R"((\w+?)(x(\d+))?(_ASAP7_\d+t_\w+)?)");
+
+    std::smatch matches;
+
+    if (std::regex_match(cellName, matches, basePattern)) {
+        return { matches[1].str(), matches[2].str(), matches[3].str() };
+    }
+
+    if (std::regex_match(cellName, matches, xpPattern)) {
+        return { matches[1].str(), "p" + matches[2].str(), matches[3].str() };
+    }
+
+    if (std::regex_match(cellName, matches, simplePattern)) {
+        std::string drive = matches[3].matched ? matches[3].str() : "1";
+        std::string suffix = matches[4].matched ? matches[4].str().substr(1) : "";
+        return { matches[1].str(), drive, suffix };
+    }
+
+    return { cellName, "1", "" };
 }
 
 std::vector<std::string> CellReplacer::findCellVariantsInLEF(const std::string& baseCell, const std::string& suffix) {
     std::vector<std::string> variants;
-
-    std::regex variantPattern("^" + baseCell + "x\\d+" + suffix + "$");
+    std::string suffixPattern = suffix.empty() ? "" : "_" + suffix;
 
     for (const auto* macro : lefData.getMacroes()) {
-
         if (!macro || macro->name.empty()) continue;
 
         const std::string& cellName = macro->name;
-        if (std::regex_match(cellName, variantPattern)) {
-            variants.push_back(cellName);
+
+        if (cellName.find(baseCell) == 0 &&(suffix.empty() || cellName.find(suffixPattern) != std::string::npos)) {
+            size_t baseLen = baseCell.length();
+            if (cellName.length() > baseLen && (cellName[baseLen] == 'x' || (cellName[baseLen] == 'x' && cellName[baseLen + 1] == 'p'))) {
+                variants.push_back(cellName);
+            }
         }
     }
+
+    std::sort(variants.begin(), variants.end(), [this](const auto& a, const auto& b) {return this->getDriveStrength(a) < this->getDriveStrength(b);});
 
     return variants;
 }
@@ -105,7 +181,16 @@ std::string CellReplacer::selectOptimalVariant(const std::vector<std::string>& v
 
 int CellReplacer::getDriveStrength(const std::string& cellName) const {
     std::regex drivePattern(R"(x(\d+))");
+    std::regex xpDrivePattern(R"(xp(\d+))");
+    std::regex xpDigitDrivePattern(R"(x(p\d+))");
     std::smatch matches;
+
+    if (std::regex_search(cellName, matches, xpDrivePattern)) {
+        return std::stoi(matches[1].str());
+    }
+    if (std::regex_search(cellName, matches, xpDigitDrivePattern)) {
+        return std::stoi(matches[1].str().substr(1));
+    }
     if (std::regex_search(cellName, matches, drivePattern)) {
         return std::stoi(matches[1].str());
     }
@@ -204,14 +289,10 @@ void CellReplacer::adjustPlacementWithOrientation(def::DEF_File& defFile, def::C
     }
 }
 
-void CellReplacer::updateDEFComponent(def::DEF_File& defFile,def::COMPONENTS_class* component,const std::string& OldCell,const std::string& NewCell,int fanout) {
+void CellReplacer::updateDEFComponent(def::DEF_File& defFile,def::COMPONENTS_class* component,const std::string& OldCell,const std::string& NewCell,double max—apacitance) {
 
     const auto OldSize = lefData.getScaledMacroSize(OldCell);
     const auto NewSize = lefData.getScaledMacroSize(NewCell);
-
-    std::cout << "Replacing " << component->compName
-        << " from " << OldCell << " to " << NewCell
-        << " (fanout = " << fanout << ")" << std::endl;
 
     component->modelName = NewCell;
 
@@ -244,10 +325,9 @@ void CellReplacer::updateDEFComponent(def::DEF_File& defFile,def::COMPONENTS_cla
 
 void CellReplacer::compactLayout(def::DEF_File& defFile) {
     auto& components = const_cast<std::vector<def::COMPONENTS_class*>&>(defFile.get_all_component());
-    std::sort(components.begin(), components.end(),
-        [](const def::COMPONENTS_class* a, const def::COMPONENTS_class* b) {
+    std::sort(components.begin(), components.end(),[](const def::COMPONENTS_class* a, const def::COMPONENTS_class* b) {
             return std::tie(a->POS.y, a->POS.x) < std::tie(b->POS.y, b->POS.x);
-        });
+    });
 
     double currentY = components.empty() ? 0 : components[0]->POS.y;
     double currentX = 0;
@@ -263,9 +343,7 @@ void CellReplacer::compactLayout(def::DEF_File& defFile) {
 
         for (auto* other : components) {
             if (other == comp) continue;
-            if (other->POS.y == currentY &&
-                other->POS.x >= currentX &&
-                other->POS.x < currentX + size.first) {
+            if (other->POS.y == currentY && other->POS.x >= currentX && other->POS.x < currentX + size.first) {
                 currentX = other->POS.x + lefData.getMacroSize(other->modelName).first;
             }
         }
@@ -274,6 +352,7 @@ void CellReplacer::compactLayout(def::DEF_File& defFile) {
         currentX += size.first;
     }
 }
+
 
 
 

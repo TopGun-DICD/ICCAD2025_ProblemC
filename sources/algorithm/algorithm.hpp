@@ -11,11 +11,12 @@ class Algorithm {
     lef::LEFData       &lef;
     def::DEF_File      &def;
 
+    liberty::Liberty& liberty;
     FanoutAnalyzer fanoutAnalyzer;
     CellReplacer cellReplacer;
 
 public:
-    Algorithm(verilog::Netlist &_netlist, lef::LEFData &_lef, def::DEF_File &_def);
+    Algorithm(verilog::Netlist &_netlist, lef::LEFData &_lef, def::DEF_File &_def, liberty::Liberty& _liberty);
 public:
     void step_1_SwapCells();
     void step_2_MoveCells();

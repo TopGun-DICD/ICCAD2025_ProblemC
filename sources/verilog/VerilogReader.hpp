@@ -17,7 +17,7 @@ namespace verilog {
         Netlist        *netlist     = nullptr;
         lef::LEFData   *lef         = nullptr;
     public:
-        ~VerilogReader();
+       ~VerilogReader();
     public:
         bool read(const std::string &_fname, Netlist &_netlist, lef::LEFData &_lef);
         void postProcessAfterDEF();

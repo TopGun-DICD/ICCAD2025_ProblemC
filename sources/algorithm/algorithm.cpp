@@ -1,6 +1,6 @@
 #include "algorithm.hpp"
 
-Algorithm::Algorithm(verilog::Netlist &_netlist, lef::LEFData &_lef, def::DEF_File &_def) : netlist(_netlist), lef(_lef), def(_def) , cellReplacer(_lef) {
+Algorithm::Algorithm(verilog::Netlist &_netlist, lef::LEFData &_lef, def::DEF_File &_def, liberty::Liberty& _liberty) : netlist(_netlist), lef(_lef), def(_def), liberty(_liberty), cellReplacer(_lef) {
 }
 
 void Algorithm::step_1_SwapCells() {}
@@ -8,9 +8,9 @@ void Algorithm::step_1_SwapCells() {}
 void Algorithm::step_2_MoveCells() {}
 
 void Algorithm::step_3_OptimizeFanout() {
-    fanoutAnalyzer.analyzeFanout(netlist);
-
-    cellReplacer.replaceCellsBasedOnFanout(netlist, fanoutAnalyzer.getFanoutCounts(), def);
+    FanoutAnalyzer analyzer;
+    analyzer.analyzeCapacitance(netlist);
+    cellReplacer.replaceCellsBasedOnCapacitance(netlist, liberty, analyzer.getCapacitanceMap(), def);
 }
 
 

@@ -37,6 +37,12 @@
     <Filter Include="Source Files\algorithm">
       <UniqueIdentifier>{0b46c133-f87b-4e39-83a6-12b255d55a8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\liberty">
+      <UniqueIdentifier>{d2a1ea65-fc4e-4174-a373-c0e94b957053}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\liberty">
+      <UniqueIdentifier>{2320507e-74e1-4611-93fb-0bec8e474cc9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sources\main.cpp">
@@ -66,11 +72,19 @@
     <ClCompile Include="..\..\sources\algorithm\algorithm.cpp">
       <Filter>Source Files\algorithm</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="..\..\sources\algorithm\CellReplacer.cpp">
       <Filter>Source Files\algorithm</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sources\algorithm\FanoutAnalyzer.cpp">
       <Filter>Source Files\algorithm</Filter>
+=======
+    <ClCompile Include="..\..\sources\liberty\Liberty.cpp">
+      <Filter>Source Files\liberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\liberty\LibertyReader.cpp">
+      <Filter>Source Files\liberty</Filter>
+>>>>>>> d88aaef4be4f53d7f30a5e1bb08b53cecf2dac8a
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -104,11 +118,19 @@
     <ClInclude Include="..\..\sources\algorithm\algorithm.hpp">
       <Filter>Header Files\algorithm</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="..\..\sources\algorithm\CellReplacer.hpp">
       <Filter>Header Files\algorithm</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sources\algorithm\FanoutAnalyzer.hpp">
       <Filter>Header Files\algorithm</Filter>
+=======
+    <ClInclude Include="..\..\sources\liberty\Liberty.hpp">
+      <Filter>Header Files\liberty</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\liberty\LibertyReader.hpp">
+      <Filter>Header Files\liberty</Filter>
+>>>>>>> d88aaef4be4f53d7f30a5e1bb08b53cecf2dac8a
     </ClInclude>
   </ItemGroup>
 </Project>

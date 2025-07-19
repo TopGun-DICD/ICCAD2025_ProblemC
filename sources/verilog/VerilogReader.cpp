@@ -6,7 +6,7 @@
 
 #define MAX_TOKEN_LENGTH    256
 
-std::unordered_set<char> oneByteTokens{ '(', ')', '[', ']', '.', ',', '*', '/', '+', '-', '@', '`', '$', '\\', ';', ':', '#', '<' };
+std::unordered_set<char> oneByteTokens_Verilog { '(', ')', '[', ']', '.', ',', '*', '/', '+', '-', '@', '`', '$', '\\', ';', ':', '#', '<' };
 
 verilog::VerilogReader::~VerilogReader() {
     if (hdlCode) {
@@ -118,7 +118,7 @@ token_start:
             }
             goto token_start;
         }
-        if (oneByteTokens.find(hdlCode[posInCode]) != oneByteTokens.end()) {
+        if (oneByteTokens_Verilog.find(hdlCode[posInCode]) != oneByteTokens_Verilog.end()) {
             if (!i) {
                 token[i] = hdlCode[posInCode];
                 token[i + 1] = '\0';

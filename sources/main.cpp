@@ -4,8 +4,11 @@
 #include "verilog/VerilogReader.hpp"
 #include "lef/LEF.hpp"
 #include "lef/LEF_READER.hpp"
+#include "def/DEF.hpp"
 #include "def/DEFReader.hpp"
 #include "def/DEFWriter.hpp"
+#include "liberty/Liberty.hpp"
+#include "liberty/LibertyReader.hpp"
 #include "algorithm/algorithm.hpp"
 
 std::string printTimeStatistics(time_t start, time_t stop);
@@ -56,11 +59,28 @@ int main(int argc, char* argv[]) {
     std::cout << "Done reading input DEF file. File has been read in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
     //*/
 
+    //*
+    std::cout << "Reading input Liberty files, " << cmdLine.libs.size() << " files to read.\n";
+    liberty::Liberty        liberty;
+    liberty::LibertyReader  libReader;
+    for (const auto &lib_file : cmdLine.libs) {
+        std::cout << "  * Reading file '" << lib_file << "'...\n";
+        timeStart = std::clock();
+        if (!libReader.read(lib_file, liberty, netlist))
+            return EXIT_FAILURE;
+        timeStop = std::clock() - timeStart;
+        timeSum += timeStop;
+        std::cout << "    Done in " << printTimeStatistics(timeStart, timeStop) << "\n";
+    }
+    libReader.postProcessAfterAll();
+    std::cout << "Done reading " << cmdLine.lefs.size() << " Liberty files. It took " << printTimeStatistics(0, timeSum) << " in total\n\n";
+    //*/
+
     std::cout << "Prepare internal data for the algorithms...\n\n";
     verilogReader.postProcessAfterDEF();
 
     // Process the data...
-    Algorithm algorithm(netlist, lef, def);
+    Algorithm algorithm(netlist, lef, def,liberty);
 
     std::cout << "Algoritm : performing step 1...\n";
     timeStart = std::clock();
@@ -68,7 +88,7 @@ int main(int argc, char* argv[]) {
     timeStop = std::clock() - timeStart;
     std::cout << "Step 1 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
 
-    std::cout << "Algoritm : performing step 3...\n";
+    std::cout << "Algoritm : performing step 2...\n";
     timeStart = std::clock();
     algorithm.step_2_MoveCells();
     timeStop = std::clock() - timeStart;

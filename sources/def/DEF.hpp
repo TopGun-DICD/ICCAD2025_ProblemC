@@ -161,19 +161,19 @@ class SPECIALNETS_class {
 class DEF_File {
 public:
     int Flag_per_tz = 0;
-    char BUSBITCHARS[2]; // Разделяющие символы для шинных битов(нужно уточнить их 2 или 3) gпо умолчанию []
+    char BUSBITCHARS[2] = { '[', ']' }; // Разделяющие символы для шинных битов(нужно уточнить их 2 или 3) gпо умолчанию []
     float version;
     char DIVIDERCHAR = '/';  //символ разделитель по умолчанию /
     std::string DESIGN;
    // std::vector<std::string> PRO; //раскоменчивание все ломает
 
-    int UNITS_DISTANCE_MICRONS;
+    int UNITS_DISTANCE_MICRONS = 0;
     Rect DIEAREA;
     std::vector<std::string> beginning;// мусор в начале, не парсим
 
     int COUNT_COMPONENTS = 0;
     std::vector<COMPONENTS_class *> COMPONENTS;
-    int numBlockages;
+    int numBlockages = 0;
     std::vector<BLOCKAGES_class *>  BLOCKAGES;
     int COUNT_VIAS = 0;
     std::vector<std::string> VIAS_str;// читается без нормального парса

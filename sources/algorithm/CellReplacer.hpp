@@ -3,6 +3,7 @@
 #include "../verilog/Verilog.hpp"
 #include "../def/DEF.hpp"
 #include "../lef/LEF.hpp"
+#include "../liberty/Liberty.hpp"
 #include <iostream>
 #include <unordered_map>
 #include <regex>
@@ -13,20 +14,22 @@ class CellReplacer {
 public:
     CellReplacer(lef::LEFData& lefData);
 
-    void replaceCellsBasedOnFanout(verilog::Netlist& netlist,const std::unordered_map<std::string, int>& fanoutCounts,def::DEF_File& defFile);
-    std::tuple<std::string,int, std::string> parseCellName(const std::string& cellName);
+    void replaceCellsBasedOnCapacitance(verilog::Netlist& netlist, const liberty::Liberty& liberty, const std::unordered_map<std::string, double>& capacitanceMap, def::DEF_File& defFile);
+    std::tuple<std::string, std::string, std::string> parseCellName(const std::string& cellName);
     std::vector<std::string> findCellVariantsInLEF(const std::string& baseCell, const std::string& suffix);
     std::string selectOptimalVariant(const std::vector<std::string>& variants, int fanout, const std::string& currentCell) const ;
-    void updateDEFComponent(def::DEF_File& defFile, def::COMPONENTS_class* component, const std::string& OldCell, const std::string& NewCell, int fanout);
+    void updateDEFComponent(def::DEF_File& defFile, def::COMPONENTS_class* component, const std::string& OldCell, const std::string& NewCell, double capacitance);
     void compactLayout(def::DEF_File& defFile);
     int getDriveStrength(const std::string& cellName) const;
     double getRowHeight() const;
     double getMaxRowWidth() const;
 
-
 private:
     lef::LEFData& lefData;
     std::unordered_map<std::string, std::vector<std::string>> cellVariants;
+
+    liberty::Cell* findLibertyCell(const liberty::Liberty& liberty, const std::string& cellName);
+    double getMaxOutputCapacitance(const liberty::Cell* cell);
 
     struct RowInfo {
         double y;
@@ -40,4 +43,5 @@ private:
     bool tryMoveToAdjacentRow(def::DEF_File& defFile, def::COMPONENTS_class* comp, const std::pair<double, double>& newSize, const std::vector<RowInfo>& rows);
     void adjustPlacementWithOrientation(def::DEF_File& defFile, def::COMPONENTS_class* component, const std::pair<double, double>& oldSize, const std::pair<double, double>& newSize);
     const double maxRowWidth = 100.0;
+
 };
