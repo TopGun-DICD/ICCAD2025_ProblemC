@@ -2,8 +2,15 @@
 
 CellReplacer::CellReplacer(lef::LEFData& lefData) : lefData(lefData) {}
 
-void CellReplacer::replaceCellsBasedOnCapacitance(verilog::Netlist& netlist,const liberty::Liberty& liberty,const std::unordered_map<std::string, double>& capacitanceMap,def::DEF_File& defFile) {
+std::vector<std::tuple<std::string, std::string, std::string, double, double, std::string>> replacements;
+
+void CellReplacer::replaceCellsBasedOnCapacitance(verilog::Netlist& netlist,
+    const liberty::Liberty& liberty,
+    const std::unordered_map<std::string, double>& capacitanceMap,
+    def::DEF_File& defFile) {
     const auto rows = analyzeRows(defFile);
+    replacements.clear();
+    std::unordered_map<std::string, std::pair<std::string, std::string>> replacementMap;
 
     for (const auto& [instanceName, maxCapacitance] : capacitanceMap) {
         auto* defComponent = defFile.get_component(instanceName);
@@ -72,17 +79,34 @@ void CellReplacer::replaceCellsBasedOnCapacitance(verilog::Netlist& netlist,cons
                 //std::cout << "Moved to adjacent row." << std::endl;
             }
         }
-
         if (placementSuccess) {
+            replacements.emplace_back(
+                defComponent->compName,
+                originalCell,
+                bestReplacement,
+                defComponent->POS.x,
+                defComponent->POS.y,
+                def::DEFWriter::Orientation_transform(defComponent->POS.orientation)
+            );
+
             defComponent->modelName = bestReplacement;
             updateDEFComponent(defFile, defComponent, originalCell, bestReplacement, maxCapacitance);
-            //std::cout << "Successfully replaced " << originalCell<< " with " << bestReplacement << std::endl;
-        }
-        else {
-            //std::cout << "Could not place replacement cell " << bestReplacement << std::endl;
         }
     }
-    compactLayout(defFile);
+
+    if (!compactLayout(defFile, replacementMap)) {
+        std::cerr << "Warning: Could not place all cells, rolling back changes\n";
+        for (auto& [compName, cells] : replacementMap) {
+            auto* comp = defFile.get_component(compName);
+            if (comp) comp->modelName = cells.first;
+        }
+        replacements.clear();
+    }
+}
+
+const std::vector<std::tuple<std::string, std::string, std::string, double, double, std::string>>&
+CellReplacer::getReplacements() const {
+    return replacements;
 }
 
 liberty::Cell* CellReplacer::findLibertyCell(const liberty::Liberty& liberty, const std::string& cellName) {
@@ -323,36 +347,53 @@ void CellReplacer::updateDEFComponent(def::DEF_File& defFile,def::COMPONENTS_cla
     }
 }
 
-void CellReplacer::compactLayout(def::DEF_File& defFile) {
+bool CellReplacer::compactLayout(def::DEF_File& defFile,const std::unordered_map<std::string, std::pair<std::string, std::string>>& replacementMap) {
     auto& components = const_cast<std::vector<def::COMPONENTS_class*>&>(defFile.get_all_component());
-    std::sort(components.begin(), components.end(),[](const def::COMPONENTS_class* a, const def::COMPONENTS_class* b) {
-            return std::tie(a->POS.y, a->POS.x) < std::tie(b->POS.y, b->POS.x);
-    });
+    std::sort(components.begin(), components.end(), [](const auto* a, const auto* b) {
+        return std::tie(a->POS.y, a->POS.x) < std::tie(b->POS.y, b->POS.x);
+        });
 
-    double currentY = components.empty() ? 0 : components[0]->POS.y;
-    double currentX = 0;
     double rowHeight = getRowHeight();
-    double maxWidth = getMaxRowWidth();
+    double maxRowWidth = getMaxRowWidth();
+    double currentY = components.empty() ? 0 : components[0]->POS.y;
+    double currentX = defFile.DIEAREA.x1;
+
+
+    std::unordered_map<std::string, def::Position> originalPositions;
+    for (auto* comp : components) {
+        originalPositions[comp->compName] = comp->POS;
+    }
 
     for (auto* comp : components) {
-        auto size = lefData.getMacroSize(comp->modelName);
-        if (currentX + size.first > maxWidth) {
-            currentY += rowHeight;
-            currentX = 0;
-        }
+        auto size = lefData.getScaledMacroSize(comp->modelName);
 
-        for (auto* other : components) {
-            if (other == comp) continue;
-            if (other->POS.y == currentY && other->POS.x >= currentX && other->POS.x < currentX + size.first) {
-                currentX = other->POS.x + lefData.getMacroSize(other->modelName).first;
+        if (currentX + size.first > maxRowWidth) {
+            if (replacementMap.find(comp->compName) != replacementMap.end()) {
+                comp->modelName = replacementMap.at(comp->compName).first;
+                size = lefData.getScaledMacroSize(comp->modelName);
+            }
+
+            if (currentX + size.first > maxRowWidth) {
+                currentY += rowHeight;
+                currentX = defFile.DIEAREA.x1;
+
+                if (currentX + size.first > maxRowWidth) {
+
+                    for (auto* c : components) {
+                        c->POS = originalPositions[c->compName];
+                    }
+                    return false; 
+                }
             }
         }
+
         comp->POS.x = currentX;
         comp->POS.y = currentY;
         currentX += size.first;
     }
-}
 
+    return true; 
+}
 
 
 

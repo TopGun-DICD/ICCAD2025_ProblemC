@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../def/DEF.hpp"
+#include "../def/DEFWriter.hpp"
 #include "../lef/LEF.hpp"
 #include "../verilog/Verilog.hpp"
 #include "CellReplacer.hpp"

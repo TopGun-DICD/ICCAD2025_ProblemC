@@ -11,8 +11,12 @@ void Algorithm::step_3_OptimizeFanout() {
     FanoutAnalyzer analyzer;
     analyzer.analyzeCapacitance(netlist);
     cellReplacer.replaceCellsBasedOnCapacitance(netlist, liberty, analyzer.getCapacitanceMap(), def);
-}
 
+    /*
+    def::DEFWriter writer;
+    writer.OutDEF("output1.def", def, cellReplacer.getReplacements());
+    */
+}
 
 void Algorithm::swap_cells(def::DEF_File &def, const std::string &name1, const std::string &name2) {
     def::COMPONENTS_class *component1 = def.get_component(name1);

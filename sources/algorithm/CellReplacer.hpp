@@ -2,6 +2,7 @@
 
 #include "../verilog/Verilog.hpp"
 #include "../def/DEF.hpp"
+#include "../def/DEFWriter.hpp"
 #include "../lef/LEF.hpp"
 #include "../liberty/Liberty.hpp"
 #include <iostream>
@@ -19,12 +20,16 @@ public:
     std::vector<std::string> findCellVariantsInLEF(const std::string& baseCell, const std::string& suffix);
     std::string selectOptimalVariant(const std::vector<std::string>& variants, int fanout, const std::string& currentCell) const ;
     void updateDEFComponent(def::DEF_File& defFile, def::COMPONENTS_class* component, const std::string& OldCell, const std::string& NewCell, double capacitance);
-    void compactLayout(def::DEF_File& defFile);
+    bool compactLayout(def::DEF_File& defFile, const std::unordered_map<std::string, std::pair<std::string, std::string>>& replacementMap);
     int getDriveStrength(const std::string& cellName) const;
     double getRowHeight() const;
     double getMaxRowWidth() const;
 
+    const std::vector<std::tuple<std::string, std::string, std::string, double, double, std::string>>& getReplacements() const;
+
 private:
+    std::vector<std::tuple<std::string, std::string, std::string, double, double, std::string>> replacements;
+
     lef::LEFData& lefData;
     std::unordered_map<std::string, std::vector<std::string>> cellVariants;
 
