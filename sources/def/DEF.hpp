@@ -169,6 +169,7 @@ public:
 
     int UNITS_DISTANCE_MICRONS;
     Rect DIEAREA;
+    std::vector<std::string> hair;// Шапка
     std::vector<std::string> beginning;// мусор в начале, не парсим
 
     int COUNT_COMPONENTS = 0;
