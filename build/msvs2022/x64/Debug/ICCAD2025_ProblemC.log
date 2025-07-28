@@ -1,5 +1,12 @@
-﻿  main.cpp
+﻿  algorithm.cpp
+  cmdline.cpp
+  DEFReader.cpp
+  DEFWriter.cpp
+  LEF.cpp
+  LEF_READER.cpp
+  main.cpp
   step_1_SwapCells.cpp
+  Verilog.cpp
   VerilogReader.cpp
   Создание кода...
-  ICCAD2025_ProblemC.vcxproj -> C:\Users\Ваниш\source\repos\ICCAD2025_ProblemC\bin\ICCAD2025_ProblemC.exe
+  ICCAD2025_ProblemC.vcxproj -> C:\Users\Ваниш\source\repos\ICCAD2025_ProblemC2\bin\ICCAD2025_ProblemC.exe
