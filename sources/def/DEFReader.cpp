@@ -4,7 +4,8 @@
 
 #include "NoBoostSplit.hpp"
 
-bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, verilog::Netlist &netlist) {
+bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, verilog::Netlist& netlist) {
+    //
     std::string buffer;
     std::vector<std::string> split_buffer;
     std::string BUS_DIV;
@@ -55,6 +56,7 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, 
             if (split_buffer.front() == "COMPONENTS") {
                 def.COUNT_COMPONENTS = stoi(split_buffer[1]);
                 parseComponents(&inFile, def, &i, netlist);
+                //
 
                 flagPaternov = 1;
             }
@@ -118,7 +120,8 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, 
 
 
 
-void def::DEFReader::parseComponents(std::ifstream* inFile, DEF_File& def, int* i, verilog::Netlist &netlist) {
+void def::DEFReader::parseComponents(std::ifstream* inFile, DEF_File& def, int* i, verilog::Netlist& netlist) {
+    //
     std::string buffer;
     std::vector<std::string> split_buffer;
 
@@ -137,12 +140,12 @@ void def::DEFReader::parseComponents(std::ifstream* inFile, DEF_File& def, int* 
             }
 
             def.push_back_COMPONENTS(split_buffer[1], split_buffer[2]);
-            
+            //*
             verilog::Instance *instance = netlist.top->getInstanceByName(split_buffer[1]);
             if (!instance)
                 instance = netlist.top->getInstanceByDEFName(split_buffer[1]);
             instance->placement.component = def.COMPONENTS.back();
-
+           // */
             for (const auto& word : split_buffer) {
                 if (word == "PLACED") {
                     def.COMPONENTS.back()->FIXED = def::FIXED_class::PLACED;

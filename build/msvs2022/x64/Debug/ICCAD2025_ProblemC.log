@@ -1,5 +1,5 @@
 ﻿  main.cpp
   step_1_SwapCells.cpp
-C:\Users\Ваниш\source\repos\ICCAD2025_ProblemC\sources\step_1_SwapCells.cpp(5,26): error C2065: COMPONENTS_class: необъявленный идентификатор
-C:\Users\Ваниш\source\repos\ICCAD2025_ProblemC\sources\step_1_SwapCells.cpp(5,44): error C2059: синтаксическая ошибка: >
+  VerilogReader.cpp
   Создание кода...
+  ICCAD2025_ProblemC.vcxproj -> C:\Users\Ваниш\source\repos\ICCAD2025_ProblemC\bin\ICCAD2025_ProblemC.exe

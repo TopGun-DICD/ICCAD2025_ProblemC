@@ -54,7 +54,7 @@ void def::DEFWriter::OutDEF(std::string nameOutFile, DEF_File& def) {
     if (!outFile.is_open()) {
         throw std::runtime_error("Could not open file: ");
     }
-
+   
     outFile << "VERSION " << def.version << " ;" << std::endl;
     outFile << "DIVIDERCHAR \"" << def.DIVIDERCHAR << "\" ;" << std::endl;
     outFile << "BUSBITCHARS \"" << def.BUSBITCHARS[0] << def.BUSBITCHARS[1] << "\" ;" << std::endl;
@@ -107,7 +107,8 @@ void def::DEFWriter::OutDEF(std::string nameOutFile, DEF_File& def) {
         for (int o = 0; o < def.SPECIALNETS[i]->Net_unit.size(); o++) {
             outFile << " ( " << def.SPECIALNETS[i]->Net_unit[o].first << " " << def.SPECIALNETS[i]->Net_unit[o].second << " )";
         }
-        outFile << " + USE " << USE_class_transform(def.SPECIALNETS[i]->USE) << std::endl;
+
+       // outFile << " + USE " << USE_class_transform(def.SPECIALNETS[i]->USE) << std::endl;
     }
     
     outFile << "END SPECIALNETS" << std::endl;
@@ -120,6 +121,7 @@ void def::DEFWriter::OutDEF(std::string nameOutFile, DEF_File& def) {
             if ((o != 0)&&(o%5 == 4 )) outFile << std::endl;
         }
         outFile << std::endl;
+        outFile <<";" << std::endl;
     }
     outFile << "END NETS" << std::endl;
     outFile << "END DESIGN" << std::endl;

@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
 
     std::time_t timeStart = 0,
                 timeStop = 0;
+   
     //*
     std::cout << "Reading input LEF files, " << cmdLine.lefs.size() << " files to read.\n";
     lef::LEFData    lef;
@@ -55,13 +56,13 @@ int main(int argc, char* argv[]) {
     timeStop = std::clock() - timeStart;
     std::cout << "Done reading input DEF file. File has been read in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
     //*/
-
+    ///*
     std::cout << "Prepare internal data for the algorithms...\n\n";
     verilogReader.postProcessAfterDEF();
 
     // Process the data...
     Algorithm algorithm(netlist, lef, def);
-
+    
     std::cout << "Algoritm : performing step 1...\n";
     timeStart = std::clock();
     algorithm.step_1_SwapCells();
@@ -79,15 +80,19 @@ int main(int argc, char* argv[]) {
     algorithm.step_3_OptimizeFanout();
     timeStop = std::clock() - timeStart;
     std::cout << "Step 3 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
-
-    /*
+    
+    ///*
     std::cout << "Writing the result to '" << cmdLine.outFile << "'...\n";
     timeStart = std::clock();
     def::DEFWriter defWriter;
     defWriter.OutDEF(cmdLine.outFile, def);
     timeStop = std::clock() - timeStart;
     std::cout << "Done. It took " << printTimeStatistics(timeStart, timeStop) << "\n\n";
-    //*/
+    ///*
+    //std::cout<<"count " << (netlist.top->instances.size());
+   // def::DEFWriter defWriter;
+   // defWriter.OutDEF("C:\\out.def", def);
+   
     return EXIT_SUCCESS;
 
 }
