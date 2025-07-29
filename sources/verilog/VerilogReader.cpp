@@ -60,7 +60,7 @@ void verilog::VerilogReader::postProcessAfterDEF() {
 }
 
 bool verilog::VerilogReader::readHDLCode(const std::string &fname) {
-    std::ifstream in(fname, std::ios::in);
+    std::ifstream in(fname, std::ios::in | std::ios::binary);
     if (!in.is_open())
         return false;
 
@@ -85,6 +85,10 @@ token_start:
         return;
     while (hdlCode[posInCode] == ' ' || hdlCode[posInCode] == '\t')
         ++posInCode;
+    if (hdlCode[posInCode] == '\r') {
+        ++posInCode;
+        goto token_start;
+    }
     if (hdlCode[posInCode] == '\n') {
         ++posInCode;
         ++line;
@@ -137,6 +141,8 @@ token_start:
             ++posInCode;
             ++line;
             token[i] = '\0';
+            if (token[i - 1] == '\r')
+                token[i - 1] = '\0';
             return;
         }
         token[i++] = hdlCode[posInCode++];
