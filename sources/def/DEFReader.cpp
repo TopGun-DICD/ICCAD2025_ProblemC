@@ -290,6 +290,7 @@ void def::DEFReader::parseNets(std::ifstream* inFile, DEF_File& def, int* i) {
     }
 
 }
+
 void def::DEFReader::parseSpecialnets(std::ifstream* inFile, DEF_File& def, int* i) {
     std::string buffer;
     std::vector<std::string> split_buffer;

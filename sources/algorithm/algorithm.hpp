@@ -6,6 +6,7 @@
 #include "../verilog/Verilog.hpp"
 #include "CellReplacer.hpp"
 #include "FanoutAnalyzer.hpp"
+#include "WireLengthAnalyzer.hpp"
 
 class Algorithm {
     verilog::Netlist   &netlist;

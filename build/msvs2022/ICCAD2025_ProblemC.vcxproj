@@ -22,6 +22,7 @@
     <ClCompile Include="..\..\sources\algorithm\algorithm.cpp" />
     <ClCompile Include="..\..\sources\algorithm\CellReplacer.cpp" />
     <ClCompile Include="..\..\sources\algorithm\FanoutAnalyzer.cpp" />
+    <ClCompile Include="..\..\sources\algorithm\WireLengthAnalyzer.cpp" />
     <ClCompile Include="..\..\sources\cmdline.cpp" />
     <ClCompile Include="..\..\sources\def\DEFReader.cpp" />
     <ClCompile Include="..\..\sources\def\DEFWriter.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="..\..\sources\algorithm\algorithm.hpp" />
     <ClInclude Include="..\..\sources\algorithm\CellReplacer.hpp" />
     <ClInclude Include="..\..\sources\algorithm\FanoutAnalyzer.hpp" />
+    <ClInclude Include="..\..\sources\algorithm\WireLengthAnalyzer.hpp" />
     <ClInclude Include="..\..\sources\cmdline.hpp" />
     <ClInclude Include="..\..\sources\def\DEF.hpp" />
     <ClInclude Include="..\..\sources\def\DEFReader.hpp" />

@@ -146,12 +146,28 @@ public:
     PINS_class(std::string _compName, std::string _modelName) : pinName(_compName), netName(_modelName) {}
 };
 
+class CONNECTION_class {
+public:
+    std::string compName;
+    std::string pinName;
+
+    CONNECTION_class(std::string _compName, std::string _pinName) : compName(_compName), pinName(_pinName) {}
+
+};
+
 class NETS_class {
 public:
     std::string netName;
     std::vector<Rect_str> Net_unit;
+    std::vector<CONNECTION_class> connections;
     USE_class USE = USE_class::UNDEFINED;
     NETS_class(std::string netName) : netName(netName) {}
+
+    void addConnection(const std::string& compName, const std::string& pinName) {
+        connections.emplace_back(compName, pinName);
+    }
+
+    const std::vector<CONNECTION_class>& get_all_connections() const { return connections; }
 };
 
 class SPECIALNETS_class {
@@ -160,6 +176,13 @@ class SPECIALNETS_class {
 //O
 class DEF_File {
 public:
+
+    DEF_File() : version(0), UNITS_DISTANCE_MICRONS(0),
+        DIEAREA(0, 0, 0, 0),
+        COUNT_COMPONENTS(0), numBlockages(0),
+        COUNT_VIAS(0), COUNT_PINS(0),
+        COUNT_NETS(0), COUNT_SPECIALNETS(0) {}
+
     int Flag_per_tz = 0;
     char BUSBITCHARS[2] = { '[', ']' }; // Разделяющие символы для шинных битов(нужно уточнить их 2 или 3) gпо умолчанию []
     float version;
@@ -207,6 +230,11 @@ public:
         Rect_str buffer(a, b);
         NETS.back()->Net_unit.push_back(buffer);
     }
+    void add_connection_to_NET(const std::string& compName, const std::string& pinName) {
+        if (!NETS.empty()) {
+            NETS.back()->addConnection(compName, pinName);
+        }
+    }
     void push_back_SPECIALNETS_rect_u(std::string a, std::string b) {
         Rect_str buffer(a, b);
         SPECIALNETS.back()->Net_unit.push_back(buffer);
@@ -239,7 +267,43 @@ public:
         }
         return nullptr;
     }
+    const COMPONENTS_class* get_component(std::string name) const {
+        for (int o = 0; o < COMPONENTS.size(); o++) {
+            if (COMPONENTS[o]->compName == name) {
+                return COMPONENTS[o];
+            }
+        }
+        return nullptr;
+    }
     const std::vector<COMPONENTS_class*>& get_all_component() const { return COMPONENTS; }
+    const std::vector<NETS_class*>& get_all_net() const { return NETS; }
+
+    DEF_File(const DEF_File& other) {
+        version = other.version;
+        DESIGN = other.DESIGN;
+        UNITS_DISTANCE_MICRONS = other.UNITS_DISTANCE_MICRONS;
+        DIEAREA = other.DIEAREA;
+
+        for (const auto* comp : other.COMPONENTS) {
+            COMPONENTS.push_back(new COMPONENTS_class(*comp));
+        }
+
+        for (const auto* net : other.NETS) {
+            NETS.push_back(new NETS_class(*net));
+        }
+
+        for (const auto* comp : other.COMPONENTS) {
+            COMPONENTS.push_back(new COMPONENTS_class(*comp));
+        }
+
+        for (const auto* spec : other.SPECIALNETS) {
+            SPECIALNETS.push_back(new NETS_class(*spec));
+        }
+
+        for (const auto* pin : other.PINS) {
+            PINS.push_back(new PINS_class(*pin));
+        }
+    }
 };
 
 }

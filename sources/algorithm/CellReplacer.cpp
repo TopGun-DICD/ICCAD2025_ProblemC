@@ -1,4 +1,4 @@
-#include "CellReplacer.hpp"
+﻿#include "CellReplacer.hpp"
 
 CellReplacer::CellReplacer(lef::LEFData& lefData) : lefData(lefData) {}
 
@@ -25,7 +25,7 @@ void CellReplacer::replaceCellsBasedOnCapacitance(verilog::Netlist& netlist,
         std::vector<std::string> variants = findCellVariantsInLEF(baseCell, suffix);
 
         if (variants.empty()) continue;
-      
+
         double originalMaxCap = getMaxOutputCapacitance(instance->libertyCell);
 
         //std::cout << "\nChecking instance: " << instanceName << std::endl;
@@ -33,7 +33,7 @@ void CellReplacer::replaceCellsBasedOnCapacitance(verilog::Netlist& netlist,
         //std::cout << "Required max capacitance: " << maxCapacitance << std::endl;
 
         if (maxCapacitance <= originalMaxCap) continue;
-        
+
         std::string bestReplacement;
         double bestCap = originalMaxCap;
         std::pair<double, double> bestSize;
@@ -43,7 +43,7 @@ void CellReplacer::replaceCellsBasedOnCapacitance(verilog::Netlist& netlist,
 
             liberty::Cell* variantCell = findLibertyCell(liberty, variant);
             if (!variantCell) continue;
-            
+
 
             double variantCap = getMaxOutputCapacitance(variantCell);
             auto variantSize = lefData.getScaledMacroSize(variant);
@@ -67,7 +67,7 @@ void CellReplacer::replaceCellsBasedOnCapacitance(verilog::Netlist& netlist,
         //std::cout << "Selected replacement: " << bestReplacement<< " (cap: " << bestCap << ")" << std::endl;
 
         bool placementSuccess = false;
-        auto currentRowIt = std::find_if(rows.begin(), rows.end(),[defComponent](const RowInfo& r) { return r.y == defComponent->POS.y; });
+        auto currentRowIt = std::find_if(rows.begin(), rows.end(), [defComponent](const RowInfo& r) { return r.y == defComponent->POS.y; });
 
         if (currentRowIt != rows.end()) {
             if (canPlaceInRow(const_cast<RowInfo&>(*currentRowIt), defComponent, bestSize)) {
@@ -95,7 +95,7 @@ void CellReplacer::replaceCellsBasedOnCapacitance(verilog::Netlist& netlist,
     }
 
     if (!compactLayout(defFile, replacementMap)) {
-        std::cerr << "Warning: Could not place all cells, rolling back changes\n";
+        //std::cerr << "Warning: Could not place all cells, rolling back changes\n";
         for (auto& [compName, cells] : replacementMap) {
             auto* comp = defFile.get_component(compName);
             if (comp) comp->modelName = cells.first;
@@ -122,7 +122,7 @@ liberty::Cell* CellReplacer::findLibertyCell(const liberty::Liberty& liberty, co
 
 double CellReplacer::getMaxOutputCapacitance(const liberty::Cell* cell) {
     if (!cell) return 0.0;
-    
+
     if (cell->outs.empty()) return 0.0;
 
     double maxCap = 0.0;
@@ -168,7 +168,7 @@ std::vector<std::string> CellReplacer::findCellVariantsInLEF(const std::string& 
 
         const std::string& cellName = macro->name;
 
-        if (cellName.find(baseCell) == 0 &&(suffix.empty() || cellName.find(suffixPattern) != std::string::npos)) {
+        if (cellName.find(baseCell) == 0 && (suffix.empty() || cellName.find(suffixPattern) != std::string::npos)) {
             size_t baseLen = baseCell.length();
             if (cellName.length() > baseLen && (cellName[baseLen] == 'x' || (cellName[baseLen] == 'x' && cellName[baseLen + 1] == 'p'))) {
                 variants.push_back(cellName);
@@ -241,7 +241,7 @@ std::vector<CellReplacer::RowInfo> CellReplacer::analyzeRows(def::DEF_File& defF
         rowMap[comp->POS.y].y = comp->POS.y;
     }
 
-    for (auto& [y,row] : rowMap) {
+    for (auto& [y, row] : rowMap) {
         row.startX = defFile.DIEAREA.x1;
         row.endX = defFile.DIEAREA.x2;
         rows.push_back(row);
@@ -288,7 +288,7 @@ void CellReplacer::adjustPlacementWithOrientation(def::DEF_File& defFile, def::C
     double deltaX = newSize.first - oldSize.first;
     double deltaY = newSize.second - oldSize.second;
 
-    if (deltaX != 0 || deltaY != 0) {
+    if (deltaY != 0) {
         switch (component->POS.orientation) {
         case def::Orientation::N: component->POS.orientation = def::Orientation::S; break;
         case def::Orientation::S: component->POS.orientation = def::Orientation::N; break;
@@ -303,7 +303,16 @@ void CellReplacer::adjustPlacementWithOrientation(def::DEF_File& defFile, def::C
         for (auto* other : defFile.get_all_component()) {
             if (other == component) continue;
             if (other->POS.y == component->POS.y && other->POS.x > component->POS.x) {
-                other->POS.x += deltaX;  
+                other->POS.x += deltaX;
+            }
+        }
+    }
+
+    if(deltaX != 0) {
+        for (auto* other : defFile.get_all_component()) {
+            if (other == component) continue;
+            if (other->POS.y == component->POS.y && other->POS.x > component->POS.x) {
+                other->POS.x += deltaX;
             }
         }
     }
@@ -313,7 +322,7 @@ void CellReplacer::adjustPlacementWithOrientation(def::DEF_File& defFile, def::C
     }
 }
 
-void CellReplacer::updateDEFComponent(def::DEF_File& defFile,def::COMPONENTS_class* component,const std::string& OldCell,const std::string& NewCell,double max�apacitance) {
+void CellReplacer::updateDEFComponent(def::DEF_File& defFile, def::COMPONENTS_class* component, const std::string& OldCell, const std::string& NewCell, double maxÑapacitance) {
 
     const auto OldSize = lefData.getScaledMacroSize(OldCell);
     const auto NewSize = lefData.getScaledMacroSize(NewCell);
@@ -326,7 +335,6 @@ void CellReplacer::updateDEFComponent(def::DEF_File& defFile,def::COMPONENTS_cla
         if (component->POS.orientation == def::Orientation::FS) {
             component->POS.y -= NewSize.second;
         }
-
         /*
         std::cout << "Adjusted placement for " << component->compName
             << ": new position (" << component->POS.x << ", " << component->POS.y << ")"
@@ -338,7 +346,8 @@ void CellReplacer::updateDEFComponent(def::DEF_File& defFile,def::COMPONENTS_cla
             if (other->POS.y == component->POS.y && other != component) {
                 std::cout << "  " << other->compName << ": (" << other->POS.x << ", " << other->POS.y << ")\n";
             }
-        }*/
+        }
+        */
     }
 
     if (component->FIXED == def::FIXED_class::UNPLACED) {
@@ -347,7 +356,7 @@ void CellReplacer::updateDEFComponent(def::DEF_File& defFile,def::COMPONENTS_cla
     }
 }
 
-bool CellReplacer::compactLayout(def::DEF_File& defFile,const std::unordered_map<std::string, std::pair<std::string, std::string>>& replacementMap) {
+bool CellReplacer::compactLayout(def::DEF_File& defFile, const std::unordered_map<std::string, std::pair<std::string, std::string>>& replacementMap) {
     auto& components = const_cast<std::vector<def::COMPONENTS_class*>&>(defFile.get_all_component());
     std::sort(components.begin(), components.end(), [](const auto* a, const auto* b) {
         return std::tie(a->POS.y, a->POS.x) < std::tie(b->POS.y, b->POS.x);
@@ -382,7 +391,7 @@ bool CellReplacer::compactLayout(def::DEF_File& defFile,const std::unordered_map
                     for (auto* c : components) {
                         c->POS = originalPositions[c->compName];
                     }
-                    return false; 
+                    return false;
                 }
             }
         }
@@ -392,8 +401,9 @@ bool CellReplacer::compactLayout(def::DEF_File& defFile,const std::unordered_map
         currentX += size.first;
     }
 
-    return true; 
+    return true;
 }
+
 
 
 
