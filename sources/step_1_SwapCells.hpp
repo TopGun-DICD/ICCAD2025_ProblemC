@@ -4,4 +4,6 @@
 #include <string>
 #include <fstream>
 
-void step_1_SwapCells(verilog::Module* _Module);
+
+int recalculating_links(verilog::Instance ins, def::Position pos);
+void step_1_SwapCells_u(verilog::Module* top, def::DEF_File* def);

@@ -3,6 +3,7 @@
 #include "../def/DEF.hpp"
 #include "../lef/LEF.hpp"
 #include "../verilog/Verilog.hpp"
+#include "../step_1_SwapCells.hpp"
 
 class Algorithm {
     verilog::Netlist   &netlist;

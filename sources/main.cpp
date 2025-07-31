@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
 
     // Process the data...
     Algorithm algorithm(netlist, lef, def);
-    
+    /*
     std::cout << "Algoritm : performing step 1...\n";
     timeStart = std::clock();
     algorithm.step_1_SwapCells();
@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
     algorithm.step_3_OptimizeFanout();
     timeStop = std::clock() - timeStart;
     std::cout << "Step 3 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
-    
+    */
     ///*
     std::cout << "Writing the result to '" << cmdLine.outFile << "'...\n";
     timeStart = std::clock();
@@ -89,9 +89,13 @@ int main(int argc, char* argv[]) {
     timeStop = std::clock() - timeStart;
     std::cout << "Done. It took " << printTimeStatistics(timeStart, timeStop) << "\n\n";
     ///*
-    //std::cout<<"count " << (netlist.top->instances.size());
-   // def::DEFWriter defWriter;
-   // defWriter.OutDEF("C:\\out.def", def);
+    
+    
+    
+   // std::cout << "count " << def.COUNT_NETS << std::endl;
+   
+    def::DEFWriter def_Writer;
+    def_Writer.OutDEF("C:\\out.def", def);
    
     return EXIT_SUCCESS;
 

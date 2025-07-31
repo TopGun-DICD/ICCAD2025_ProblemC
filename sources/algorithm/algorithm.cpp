@@ -1,9 +1,12 @@
 #include "algorithm.hpp"
+#include "../step_1_SwapCells.hpp"
 
 Algorithm::Algorithm(verilog::Netlist &_netlist, lef::LEFData &_lef, def::DEF_File &_def) : netlist(_netlist), lef(_lef), def(_def) {
 }
 
-void Algorithm::step_1_SwapCells() {}
+void Algorithm::step_1_SwapCells() {
+    step_1_SwapCells_u(netlist.top, &def);
+}
 
 void Algorithm::step_2_MoveCells() {}
 

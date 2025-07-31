@@ -19,7 +19,7 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, 
     while (getline(inFile, buffer)) {
         i++;
         if (!buffer.empty()) {
-
+           
             my_boost::trim(buffer);
             my_boost::split(split_buffer, buffer, my_boost::is_any_of<char>(" "), true);
 
@@ -97,7 +97,7 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, 
                 ifter = split_buffer[0];
             }
 
-            if ((flagPaternov == 0) && (split_buffer[0] != "#")) {
+            if ((flagPaternov == 0) && (split_buffer[0] != "#") && (buffer != "###############################################################") ) {
 
                 if (!buffer.empty()) {
                     def.beginning.push_back(buffer);
@@ -113,6 +113,8 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, 
             flagPaternov = 0;
 
         }
+           
+        
     }
     inFile.close();
     return true;
@@ -521,13 +523,8 @@ void def::DEFReader::parsePROPERTYDEFINITIONS(std::ifstream* inFile, DEF_File& d
                 //cout << "END VIAS " << *i << endl;         
                 return;
             }
-                 //   def.PRO.push_back(buffer);
-        
+               def.PROPERTYDEFINITIONS.push_back(buffer);
         }
-        
-       
-        def.beginning.push_back(buffer);
-        
 
         split_buffer.clear();
     }

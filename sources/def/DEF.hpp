@@ -165,7 +165,7 @@ public:
     float version;
     char DIVIDERCHAR = '/';  //символ разделитель по умолчанию /
     std::string DESIGN;
-   // std::vector<std::string> PRO; //раскоменчивание все ломает
+    std::vector<std::string> PROPERTYDEFINITIONS; //раскоменчивание все ломает
 
     int UNITS_DISTANCE_MICRONS;
     Rect DIEAREA;
