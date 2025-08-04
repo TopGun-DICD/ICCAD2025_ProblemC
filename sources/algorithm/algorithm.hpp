@@ -7,6 +7,7 @@
 #include "CellReplacer.hpp"
 #include "FanoutAnalyzer.hpp"
 #include "WireLengthAnalyzer.hpp"
+#include "../step_1_SwapCells.hpp"
 
 class Algorithm {
     verilog::Netlist   &netlist;

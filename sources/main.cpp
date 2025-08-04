@@ -1,4 +1,4 @@
-
+#include "step_1_SwapCells.hpp"
 #include "cmdline.hpp"
 #include "verilog/Verilog.hpp"
 #include "verilog/VerilogReader.hpp"
@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) {
 
     std::time_t timeStart = 0,
                 timeStop = 0;
+   
     //*
     std::cout << "Reading input LEF files, " << cmdLine.lefs.size() << " files to read.\n";
     lef::LEFData    lef;
@@ -76,6 +77,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Done reading " << cmdLine.lefs.size() << " Liberty files. It took " << printTimeStatistics(0, timeSum) << " in total\n\n";
     //*/
 
+    //*
     std::cout << "Prepare internal data for the algorithms...\n\n";
     verilogReader.postProcessAfterDEF();
 
@@ -88,26 +90,36 @@ int main(int argc, char* argv[]) {
     timeStop = std::clock() - timeStart;
     std::cout << "Step 1 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
 
+    /*
     std::cout << "Algoritm : performing step 2...\n";
     timeStart = std::clock();
     algorithm.step_2_MoveCells();
     timeStop = std::clock() - timeStart;
     std::cout << "Step 2 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
+    //*/
 
     std::cout << "Algoritm : performing step 3...\n";
     timeStart = std::clock();
     algorithm.step_3_OptimizeFanout();
     timeStop = std::clock() - timeStart;
     std::cout << "Step 3 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
-
-    //*
+    
+	//*
     std::cout << "Writing the result to '" << cmdLine.outFile << "'...\n";
     timeStart = std::clock();
     def::DEFWriter defWriter;
     defWriter.OutDEF(cmdLine.outFile, def);
     timeStop = std::clock() - timeStart;
     std::cout << "Done. It took " << printTimeStatistics(timeStart, timeStop) << "\n\n";
-    //*/
+    //*
+    
+    
+    
+   // std::cout << "count " << def.COUNT_NETS << std::endl;
+   
+   //def::DEFWriter def_Writer;
+   //def_Writer.OutDEF("C:\\out.def", def);
+   
     return EXIT_SUCCESS;
 
 }

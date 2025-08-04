@@ -87,6 +87,9 @@
     <ClCompile Include="..\..\sources\algorithm\WireLengthAnalyzer.cpp">
       <Filter>Source Files\algorithm</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sources\step_1_SwapCells.cpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sources\cmdline.hpp">
@@ -132,6 +135,9 @@
       <Filter>Header Files\algorithm</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sources\algorithm\WireLengthAnalyzer.hpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\sources\step_1_SwapCells.hpp">
       <Filter>Header Files\algorithm</Filter>
     </ClInclude>
   </ItemGroup>

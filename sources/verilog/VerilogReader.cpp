@@ -22,6 +22,7 @@ bool verilog::VerilogReader::read(const std::string &_fname, Netlist &_netlist, 
     netlist = &_netlist;
     lef = &_lef;
 
+   // std::cout << "codeLength " << codeLength << std::endl;
     char token[MAX_TOKEN_LENGTH];
     while (posInCode < codeLength) {
         readToken(token);
