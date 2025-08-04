@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
     verilogReader.postProcessAfterDEF();
 
     // Process the data...
-    Algorithm algorithm(netlist, lef, def);
+    Algorithm algorithm(netlist, lef, def,liberty);
 
     std::cout << "Algoritm : performing step 1...\n";
     timeStart = std::clock();
