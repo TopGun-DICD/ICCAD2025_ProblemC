@@ -269,7 +269,7 @@ bool CellReplacer::tryMoveToAdjacentRow(def::DEF_File& defFile, def::COMPONENTS_
     if (currentRowIt != rows.begin()) {
         auto& prevRow = *(currentRowIt - 1);
         if (canPlaceInRow(const_cast<RowInfo&>(prevRow), comp, newSize)) {
-            comp->POS.y = prevRow.y;
+            comp->POS.y = static_cast<int>(prevRow.y);
             return true;
         }
     }
@@ -277,7 +277,7 @@ bool CellReplacer::tryMoveToAdjacentRow(def::DEF_File& defFile, def::COMPONENTS_
     if (currentRowIt + 1 != rows.end()) {
         auto& nextRow = *(currentRowIt + 1);
         if (canPlaceInRow(const_cast<RowInfo&>(nextRow), comp, newSize)) {
-            comp->POS.y = nextRow.y;
+            comp->POS.y = static_cast<int>(nextRow.y);
             return true;
         }
     }
@@ -303,7 +303,7 @@ void CellReplacer::adjustPlacementWithOrientation(def::DEF_File& defFile, def::C
         for (auto* other : defFile.get_all_component()) {
             if (other == component) continue;
             if (other->POS.y == component->POS.y && other->POS.x > component->POS.x) {
-                other->POS.x += deltaX;
+                other->POS.x += static_cast<int>(deltaX);
             }
         }
     }
@@ -312,13 +312,13 @@ void CellReplacer::adjustPlacementWithOrientation(def::DEF_File& defFile, def::C
         for (auto* other : defFile.get_all_component()) {
             if (other == component) continue;
             if (other->POS.y == component->POS.y && other->POS.x > component->POS.x) {
-                other->POS.x += deltaX;
+                other->POS.x += static_cast<int>(deltaX);
             }
         }
     }
 
     if (component->POS.orientation == def::Orientation::FS) {
-        component->POS.y -= newSize.second;
+        component->POS.y -= static_cast<int>(newSize.second);
     }
 }
 
@@ -333,7 +333,7 @@ void CellReplacer::updateDEFComponent(def::DEF_File& defFile, def::COMPONENTS_cl
         adjustPlacementWithOrientation(defFile, component, OldSize, NewSize);
 
         if (component->POS.orientation == def::Orientation::FS) {
-            component->POS.y -= NewSize.second;
+            component->POS.y -= static_cast<int>(NewSize.second);
         }
         /*
         std::cout << "Adjusted placement for " << component->compName
@@ -396,8 +396,8 @@ bool CellReplacer::compactLayout(def::DEF_File& defFile, const std::unordered_ma
             }
         }
 
-        comp->POS.x = currentX;
-        comp->POS.y = currentY;
+        comp->POS.x = static_cast<int>(currentX);
+        comp->POS.y = static_cast<int>(currentY);
         currentX += size.first;
     }
 
