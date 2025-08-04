@@ -48,7 +48,7 @@ std::string def::DEFWriter::USE_class_transform(USE_class o) {
     return std::string("");
 }
 
-void def::DEFWriter::OutDEF(std::string nameOutFile, DEF_File& def, const std::vector<std::tuple<std::string, std::string, std::string, double, double, std::string>>& replacements) {
+void def::DEFWriter::OutDEF(std::string nameOutFile, DEF_File& def) {
 
     std::ofstream outFile(nameOutFile);
     if (!outFile.is_open()) {
@@ -119,7 +119,7 @@ void def::DEFWriter::OutDEF(std::string nameOutFile, DEF_File& def, const std::v
             outFile << " ( " << def.NETS[i]->Net_unit[o].first << " " << def.NETS[i]->Net_unit[o].second << " )";
             if ((o != 0) && (o % 5 == 4)) outFile << std::endl;
         }
-        outFile << std::endl;
+        outFile << " ;" << std::endl;
     }
     outFile << "END NETS" << std::endl;
     outFile << "END DESIGN" << std::endl;
