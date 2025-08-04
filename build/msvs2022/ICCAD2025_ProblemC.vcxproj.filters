@@ -1,36 +1,144 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\sources\algorithm\algorithm.cpp" />
-    <ClCompile Include="..\..\sources\algorithm\CellReplacer.cpp" />
-    <ClCompile Include="..\..\sources\algorithm\FanoutAnalyzer.cpp" />
-    <ClCompile Include="..\..\sources\cmdline.cpp" />
-    <ClCompile Include="..\..\sources\def\DEFReader.cpp" />
-    <ClCompile Include="..\..\sources\def\DEFWriter.cpp" />
-    <ClCompile Include="..\..\sources\lef\LEF.cpp" />
-    <ClCompile Include="..\..\sources\lef\LEF_READER.cpp" />
-    <ClCompile Include="..\..\sources\liberty\Liberty.cpp" />
-    <ClCompile Include="..\..\sources\liberty\LibertyReader.cpp" />
-    <ClCompile Include="..\..\sources\main.cpp" />
-    <ClCompile Include="..\..\sources\verilog\Verilog.cpp" />
-    <ClCompile Include="..\..\sources\verilog\VerilogReader.cpp" />
-    <ClCompile Include="..\..\sources\algorithm\WireLengthAnalyzer.cpp" />
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\verilog">
+      <UniqueIdentifier>{0e199b40-1f53-40d9-996b-6c03fbc1d056}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lef">
+      <UniqueIdentifier>{91287072-3398-4e12-bf9b-26438c10591a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\def">
+      <UniqueIdentifier>{6daff1ae-fb04-4a74-8c38-3a565b6b18dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\verilog">
+      <UniqueIdentifier>{3279ad2c-c771-4afb-9ec3-f7a376e85641}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\def">
+      <UniqueIdentifier>{5ea76672-2e39-42f1-9ddf-4c3fb91733d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lef">
+      <UniqueIdentifier>{d26db9ba-4f89-450a-81dd-1ca39c4c90b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\algorithm">
+      <UniqueIdentifier>{c59c0b54-1003-4758-ae2a-a71a37f2d540}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\algorithm">
+      <UniqueIdentifier>{4ab99651-82eb-4349-9fee-161fbab49d2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\liberty">
+      <UniqueIdentifier>{541faddc-fb9f-49be-9852-9984233cd1e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\liberty">
+      <UniqueIdentifier>{eb55de04-d634-4d40-b04f-93178ecc056a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\sources\algorithm\algorithm.hpp" />
-    <ClInclude Include="..\..\sources\algorithm\CellReplacer.hpp" />
-    <ClInclude Include="..\..\sources\algorithm\FanoutAnalyzer.hpp" />
-    <ClInclude Include="..\..\sources\cmdline.hpp" />
-    <ClInclude Include="..\..\sources\def\DEF.hpp" />
-    <ClInclude Include="..\..\sources\def\DEFReader.hpp" />
-    <ClInclude Include="..\..\sources\def\DEFWriter.hpp" />
-    <ClInclude Include="..\..\sources\def\NoBoostSplit.hpp" />
-    <ClInclude Include="..\..\sources\lef\LEF.hpp" />
-    <ClInclude Include="..\..\sources\lef\LEF_READER.hpp" />
-    <ClInclude Include="..\..\sources\liberty\Liberty.hpp" />
-    <ClInclude Include="..\..\sources\liberty\LibertyReader.hpp" />
-    <ClInclude Include="..\..\sources\verilog\Verilog.hpp" />
-    <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp" />
-    <ClInclude Include="..\..\sources\algorithm\WireLengthAnalyzer.hpp" />
+    <ClCompile Include="..\..\sources\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\cmdline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\lef\LEF_READER.cpp">
+      <Filter>Source Files\lef</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\lef\LEF.cpp">
+      <Filter>Source Files\lef</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\verilog\Verilog.cpp">
+      <Filter>Source Files\verilog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\verilog\VerilogReader.cpp">
+      <Filter>Source Files\verilog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\def\DEFReader.cpp">
+      <Filter>Source Files\def</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\def\DEFWriter.cpp">
+      <Filter>Source Files\def</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\algorithm\algorithm.cpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\liberty\Liberty.cpp">
+      <Filter>Source Files\liberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\liberty\LibertyReader.cpp">
+      <Filter>Source Files\liberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\algorithm\CellReplacer.cpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\algorithm\FanoutAnalyzer.cpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\algorithm\WireLengthAnalyzer.cpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\algorithm\step_1_SwapCells.cpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\sources\cmdline.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\verilog\Verilog.hpp">
+      <Filter>Header Files\verilog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp">
+      <Filter>Header Files\verilog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\NoBoostSplit.hpp">
+      <Filter>Header Files\def</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\DEF.hpp">
+      <Filter>Header Files\def</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\DEFReader.hpp">
+      <Filter>Header Files\def</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\def\DEFWriter.hpp">
+      <Filter>Header Files\def</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\lef\LEF_READER.hpp">
+      <Filter>Header Files\lef</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\lef\LEF.hpp">
+      <Filter>Header Files\lef</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\algorithm\algorithm.hpp">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\liberty\Liberty.hpp">
+      <Filter>Header Files\liberty</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\liberty\LibertyReader.hpp">
+      <Filter>Header Files\liberty</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\algorithm\CellReplacer.hpp">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\algorithm\FanoutAnalyzer.hpp">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\algorithm\WireLengthAnalyzer.hpp">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\algorithm\step_1_SwapCells.hpp">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
