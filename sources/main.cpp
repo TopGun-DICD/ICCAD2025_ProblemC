@@ -1,4 +1,3 @@
-#include "step_1_SwapCells.hpp"
 #include "cmdline.hpp"
 #include "verilog/Verilog.hpp"
 #include "verilog/VerilogReader.hpp"
@@ -77,7 +76,6 @@ int main(int argc, char* argv[]) {
     std::cout << "Done reading " << cmdLine.lefs.size() << " Liberty files. It took " << printTimeStatistics(0, timeSum) << " in total\n\n";
     //*/
 
-    //*
     std::cout << "Prepare internal data for the algorithms...\n\n";
     verilogReader.postProcessAfterDEF();
 
@@ -111,15 +109,8 @@ int main(int argc, char* argv[]) {
     defWriter.OutDEF(cmdLine.outFile, def);
     timeStop = std::clock() - timeStart;
     std::cout << "Done. It took " << printTimeStatistics(timeStart, timeStop) << "\n\n";
-    //*
-    
-    
-    
-   // std::cout << "count " << def.COUNT_NETS << std::endl;
-   
-   //def::DEFWriter def_Writer;
-   //def_Writer.OutDEF("C:\\out.def", def);
-   
+    //*/
+       
     return EXIT_SUCCESS;
 
 }

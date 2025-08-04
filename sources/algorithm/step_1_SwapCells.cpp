@@ -1,10 +1,10 @@
 #include "step_1_SwapCells.hpp"
-#include "def/DEFReader.hpp"
+#include "../def/DEFReader.hpp"
 #include <string>
-#include "def/DEF.hpp"
+#include "../def/DEF.hpp"
 #include <vector>
 #include <iostream>
-#include "verilog/Verilog.hpp"
+#include "../verilog/Verilog.hpp"
 
  
 int recalculating_links(verilog::Instance inst, def::Position pos) {

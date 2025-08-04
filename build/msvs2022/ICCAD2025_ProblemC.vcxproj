@@ -31,7 +31,6 @@
     <ClCompile Include="..\..\sources\liberty\Liberty.cpp" />
     <ClCompile Include="..\..\sources\liberty\LibertyReader.cpp" />
     <ClCompile Include="..\..\sources\main.cpp" />
-    <ClCompile Include="..\..\sources\step_1_SwapCells.cpp" />
     <ClCompile Include="..\..\sources\verilog\Verilog.cpp" />
     <ClCompile Include="..\..\sources\verilog\VerilogReader.cpp" />
   </ItemGroup>
@@ -49,7 +48,6 @@
     <ClInclude Include="..\..\sources\lef\LEF_READER.hpp" />
     <ClInclude Include="..\..\sources\liberty\Liberty.hpp" />
     <ClInclude Include="..\..\sources\liberty\LibertyReader.hpp" />
-    <ClInclude Include="..\..\sources\step_1_SwapCells.hpp" />
     <ClInclude Include="..\..\sources\verilog\Verilog.hpp" />
     <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp" />
   </ItemGroup>

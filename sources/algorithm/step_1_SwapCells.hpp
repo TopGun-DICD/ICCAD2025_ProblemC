@@ -1,6 +1,6 @@
 #pragma once
-#include "verilog/Verilog.hpp"
-#include "def/DEFReader.hpp"
+#include "../verilog/Verilog.hpp"
+#include "../def/DEFReader.hpp"
 #include <string>
 #include <fstream>
 

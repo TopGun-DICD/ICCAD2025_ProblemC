@@ -1,5 +1,5 @@
 #include "algorithm.hpp"
-#include "../step_1_SwapCells.hpp"
+#include "step_1_SwapCells.hpp"
 
 Algorithm::Algorithm(verilog::Netlist& _netlist, lef::LEFData& _lef, def::DEF_File& _def, liberty::Liberty& _liberty) : netlist(_netlist), lef(_lef), def(_def), liberty(_liberty), cellReplacer(_lef) {
 }
