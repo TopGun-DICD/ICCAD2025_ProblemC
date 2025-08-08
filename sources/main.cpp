@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
     // Process the data...
     Algorithm algorithm(netlist, lef, def,liberty);
 
-    /*
+    //*
     std::cout << "Algoritm : performing step 3...\n";
     timeStart = std::clock();
     algorithm.step_3_OptimizeFanout();
@@ -106,7 +106,6 @@ int main(int argc, char* argv[]) {
     std::cout << "Step 2 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
     //*/
 
-    
 	//*
     std::cout << "Writing the result to '" << cmdLine.outFile << "'...\n";
     timeStart = std::clock();

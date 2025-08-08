@@ -51,8 +51,11 @@ uint64_t recalculating_links(verilog::Instance &inst, def::Position pos) {
 	}
 	for (int i = 0; i < inst.outs.size(); i++) {
 		for (int o = 0; o < inst.outs[i]->sourceFor.size(); o++) {
-			if(inst.outs[i]->sourceFor[o])
+			//if(inst.outs[i]->sourceFor[o])
+			if (inst.outs[i]->sourceFor[o]->placement.component)
 				sum = sum + (abs(inst.outs[i]->sourceFor[o]->placement.component->POS.x - pos.x)) + (abs(inst.outs[i]->sourceFor[o]->placement.component->POS.y - pos.y));
+			else
+				sum = sum + (abs(inst.outs[i]->sourceFor[o]->placement.pin->POS.x - pos.x)) + (abs(inst.outs[i]->sourceFor[o]->placement.pin->POS.y - pos.y));
 		}
 	}
 	/*

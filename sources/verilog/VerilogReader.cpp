@@ -58,16 +58,26 @@ void verilog::VerilogReader::postProcessAfterDEF(def::DEF_File &def) {
         for (Instance *instance : module->instances)
             instance->recalcPlacementParameters();
 
-    // Create dummy instances for external pins
-    for (def::PINS_class *pin : def.PINS) {
+    // Create dummy instances for external input pins
+    for (def::PINS_class* pin : def.PINS) {
+        // inputs
         if (pin->DIRECTION == def::DIRECTION_class::INPUT) {
             Instance* temp = new Instance;
             netlist->top->instances.push_back(temp);
 
-            //verilog::Net* outNet = new verilog::Net;
             verilog::Net* outNet = netlist->top->getPortByDEFName(pin->pinName);
             outNet->driver = temp;
             temp->outs.push_back(outNet);
+            temp->placement.pin = pin;
+        }
+        // outputs
+        if (pin->DIRECTION == def::DIRECTION_class::OUTPUT) {
+            Instance* temp = new Instance;
+            netlist->top->instances.push_back(temp);
+
+            verilog::Net* inNet = netlist->top->getPortByDEFName(pin->pinName);
+            inNet->sourceFor.push_back(temp);
+            temp->ins.push_back(inNet);
             temp->placement.pin = pin;
         }
     }
