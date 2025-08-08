@@ -139,20 +139,21 @@ void step_1_SwapCells_u(verilog::Module* top, def::DEF_File* def ) {
 						if ((Sort_Instance[i][j]->placement.component->FIXED != def::FIXED_class::FIXED) && (Sort_Instance[i][k]->placement.component->FIXED != def::FIXED_class::FIXED)) {
 							// Мы не производим пересчет радиусов
 							//if (((Sort_Instance[i][j]->placement.component->POS.x - Sort_Instance[i][k]->placement.component->POS.x)+(Sort_Instance[i][j]->placement.component->POS.y - Sort_Instance[i][k]->placement.component->POS.y)) < Sort_Instance[i][j]->placement.radius) { 
-								if ((recalculating_links((*Sort_Instance[i][j]), Sort_Instance[i][k]->placement.component->POS) + 
-									 recalculating_links((*Sort_Instance[i][k]), Sort_Instance[i][j]->placement.component->POS)) < 
-									(recalculating_links((*Sort_Instance[i][j]), Sort_Instance[i][j]->placement.component->POS) + 
-									 recalculating_links((*Sort_Instance[i][k]), Sort_Instance[i][k]->placement.component->POS))&&
-									(recalculating_links_max((*Sort_Instance[i][j]), Sort_Instance[i][k]->placement.component->POS) <= 
-									recalculating_links_max((*Sort_Instance[i][j]), Sort_Instance[i][j]->placement.component->POS))&&
-									(recalculating_links_max((*Sort_Instance[i][k]), Sort_Instance[i][j]->placement.component->POS) <= 
-									recalculating_links_max((*Sort_Instance[i][k]), Sort_Instance[i][k]->placement.component->POS))) {
+							if ((recalculating_links((*Sort_Instance[i][j]), Sort_Instance[i][k]->placement.component->POS) + 
+								recalculating_links((*Sort_Instance[i][k]), Sort_Instance[i][j]->placement.component->POS)) < 
+								(recalculating_links((*Sort_Instance[i][j]), Sort_Instance[i][j]->placement.component->POS) + 
+								 recalculating_links((*Sort_Instance[i][k]), Sort_Instance[i][k]->placement.component->POS))&&
+								(recalculating_links_max((*Sort_Instance[i][j]), Sort_Instance[i][k]->placement.component->POS) <= 
+								 recalculating_links_max((*Sort_Instance[i][j]), Sort_Instance[i][j]->placement.component->POS))&&
+								(recalculating_links_max((*Sort_Instance[i][k]), Sort_Instance[i][j]->placement.component->POS) <= 
+								 recalculating_links_max((*Sort_Instance[i][k]), Sort_Instance[i][k]->placement.component->POS))) {
 									def::Position p = Sort_Instance[i][k]->placement.component->POS;
 									Sort_Instance[i][k]->placement.component->POS = Sort_Instance[i][j]->placement.component->POS;
 									Sort_Instance[i][j]->placement.component->POS = p;
 									u++;
 									
-									std::cout << "Cells of type '" << Sort_Instance[i][j]->placement.component->modelName << "' were swapped: {" 
+									std::cout << "Cells '" << Sort_Instance[i][j]->name << "' and '" << Sort_Instance[i][k]->name << "' of type '" 
+											<< Sort_Instance[i][j]->placement.component->modelName << "' were swapped: {"
 											<< Sort_Instance[i][j]->placement.component->POS.x << "," << Sort_Instance[i][j]->placement.component->POS.y << "}->{"
 										    << Sort_Instance[i][k]->placement.component->POS.x << "," << Sort_Instance[i][k]->placement.component->POS.y << "}" << std::endl;
 								//}

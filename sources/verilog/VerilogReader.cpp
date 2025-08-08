@@ -341,23 +341,33 @@ bool verilog::VerilogReader::readModuleNetsOfType(Module *module, NetType type) 
         }
 
         if (!module->nets.empty()) {
-            for (index = 0; index < module->nets.size(); ++index) {
-                if (module->nets[index]->name == token)
-                    break;
-            }
-            if (index != module->nets.size()) {
-                if (module->nets[index]->type != NetType::undefined)
+            //for (index = 0; index < module->nets.size(); ++index) {
+            //    if (module->nets[index]->name == token)
+            //        break;
+            //}
+            auto it = module->nets.find(token);
+
+            if (it != module->nets.end()) {
+                if (it->second->type != NetType::undefined)
                     std::cerr << "  __wrn__ (" << line << "): in module '" << module->name << "' net '" << token << "' already has git its type"
-                    << std::endl;
-                module->nets[index]->type = type;
+                              << std::endl;
+                it->second->type = type;
                 continue;
             }
+
+            //if (index != module->nets.size()) {
+            //    if (module->nets[index]->type != NetType::undefined)
+            //        std::cerr << "  __wrn__ (" << line << "): in module '" << module->name << "' net '" << token << "' already has git its type"
+            //        << std::endl;
+            //    module->nets[index]->type = type;
+            //    continue;
+            //}
         }
         Net *net    = new Net;
-        module->nets.push_back(net);
-        //net->owner  = module;
         net->name   = token;
         net->type   = type;
+        //module->nets.push_back(net);
+        module->nets[net->name] = net;
     }
     return true;
 }
@@ -438,13 +448,15 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
     // родительского модуля
     for (size_t i = 0; i < wires.size(); ++i) {
         // Сначала найдём цепь по имени подключаемого пина
-        size_t netIndex = 0;
-        for (netIndex = 0; netIndex < _module->nets.size(); ++netIndex)
-            if (_module->nets[netIndex]->name == wires[i])
-                break;
+        //size_t netIndex = 0;
+        //for (netIndex = 0; netIndex < _module->nets.size(); ++netIndex)
+        //    if (_module->nets[netIndex]->name == wires[i])
+        //        break;
+
+        auto it = _module->nets.find(wires[i]);
 
         // Цепь нашлась
-        if (netIndex < _module->nets.size())
+        if (it != _module->nets.end())
             // Задано ли ассоциативное назначение портов?
             // Если да
             if (!pins.empty()) {
@@ -454,11 +466,11 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
                         continue;
                     switch (port->direction) {
                         case PortDirection::input:
-                            instance->ins.push_back(_module->nets[netIndex]);
+                            instance->ins.push_back(it->second);
                             break;
                         case PortDirection::output:
                         case PortDirection::inout:
-                            instance->outs.push_back(_module->nets[netIndex]);
+                            instance->outs.push_back(it->second);
                             break;
                         default:
                             ; //TODO: std::cerr
@@ -469,11 +481,11 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
             else {
                 switch (instance->instanceOf->ports[i]->direction) {
                     case PortDirection::input:
-                        instance->ins.push_back(_module->nets[netIndex]);
+                        instance->ins.push_back(it->second);
                         break;
                     case PortDirection::output:
                     case PortDirection::inout:
-                        instance->outs.push_back(_module->nets[netIndex]);
+                        instance->outs.push_back(it->second);
                         break;
                     default:
                         ; //TODO: std::cerr
@@ -482,6 +494,7 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
 
         // Цепь не нашлась. Может это порт?
         else {
+            size_t netIndex = 0;
             for (netIndex = 0; netIndex < _module->ports.size(); ++netIndex)
                 if (_module->ports[netIndex]->name == wires[i])
                     break;

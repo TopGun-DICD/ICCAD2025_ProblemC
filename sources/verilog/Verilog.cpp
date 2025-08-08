@@ -35,9 +35,14 @@ void verilog::Instance::recalcPlacementParameters() {
 }
 
 verilog::Module::~Module() {
-    for (auto *net : nets)
-        delete net;
+    //for (auto *net : nets)
+    //    delete net;
+    //nets.clear();
+
+    for (auto it = nets.begin(); it != nets.end(); it++)
+        delete it->second;
     nets.clear();
+
     for (auto *port : ports)
         delete port;
     ports.clear();
@@ -47,9 +52,14 @@ verilog::Module::~Module() {
 }
 
 verilog::Net* verilog::Module::getNetByName(const std::string &name) {
-    for (Net *net : nets)
-        if (net->name == name)
-            return net;
+    //for (Net *net : nets)
+    //    if (net->name == name)
+    //        return net;
+    auto it = nets.find(name);
+
+    if (it != nets.end())
+        return it->second;
+
     return nullptr;
 }
 

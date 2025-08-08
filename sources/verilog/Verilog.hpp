@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "../def/DEF.hpp"
 #include "../liberty/Liberty.hpp"
@@ -65,7 +66,8 @@ namespace verilog {
 
     struct Module {
         std::string             name;
-        std::vector<Net *>      nets;
+        //std::vector<Net *>      nets;
+        std::unordered_map<std::string, Net *>  nets;
         std::vector<Port *>     ports;
         std::vector<Instance *> instances;
         uint32_t                numberOfMyInstances = 0;
