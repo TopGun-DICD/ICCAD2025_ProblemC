@@ -77,17 +77,27 @@ int main(int argc, char* argv[]) {
     //*/
 
     std::cout << "Prepare internal data for the algorithms...\n\n";
-    verilogReader.postProcessAfterDEF();
+    verilogReader.postProcessAfterDEF(def);
 
     // Process the data...
     Algorithm algorithm(netlist, lef, def,liberty);
 
+    /*
+    std::cout << "Algoritm : performing step 3...\n";
+    timeStart = std::clock();
+    algorithm.step_3_OptimizeFanout();
+    timeStop = std::clock() - timeStart;
+    std::cout << "Step 3 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
+    //*/
+
+    //*
     std::cout << "Algoritm : performing step 1...\n";
     timeStart = std::clock();
     algorithm.step_1_SwapCells();
     timeStop = std::clock() - timeStart;
     std::cout << "Step 1 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
-
+    //*/
+    
     /*
     std::cout << "Algoritm : performing step 2...\n";
     timeStart = std::clock();
@@ -96,11 +106,6 @@ int main(int argc, char* argv[]) {
     std::cout << "Step 2 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
     //*/
 
-    std::cout << "Algoritm : performing step 3...\n";
-    timeStart = std::clock();
-    algorithm.step_3_OptimizeFanout();
-    timeStop = std::clock() - timeStart;
-    std::cout << "Step 3 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
     
 	//*
     std::cout << "Writing the result to '" << cmdLine.outFile << "'...\n";

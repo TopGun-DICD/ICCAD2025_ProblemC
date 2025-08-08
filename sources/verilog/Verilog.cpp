@@ -60,6 +60,27 @@ verilog::Port* verilog::Module::getPortByName(const std::string &name) {
     return nullptr;
 }
 
+verilog::Port* verilog::Module::getPortByDEFName(const std::string& name) {
+
+    for (Port *port : ports) {
+        std::string tempName = port->name; 
+        
+        size_t pos = tempName.find_first_of('\\');
+        if (pos == std::string::npos)
+            if (port->name == name)
+                return port;
+
+        while (pos != std::string::npos) {
+            tempName.erase(pos, 1);
+            pos = tempName.find_first_of('\\');
+        }
+        if (name == tempName)
+            return port;
+    }
+    return nullptr;
+}
+
+
 verilog::Instance* verilog::Module::getInstanceByName(const std::string &name) {
     for (Instance *instance : instances)
         if (instance->name == name)

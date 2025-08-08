@@ -112,6 +112,7 @@ void def::DEFWriter::OutDEF(std::string nameOutFile, DEF_File& def) {
     }
     outFile << "END PINS" << std::endl;
 
+    /*
     outFile << "SPECIALNETS " << def.SPECIALNETS.size() << " ;" << std::endl;
     for (int i = 0; i < def.SPECIALNETS.size(); i++) {
         outFile << "\t- " << def.SPECIALNETS[i]->netName;
@@ -123,6 +124,7 @@ void def::DEFWriter::OutDEF(std::string nameOutFile, DEF_File& def) {
     }
 
     outFile << "END SPECIALNETS" << std::endl;
+    //*/
 
     outFile << "NETS " << def.NETS.size() << " ;" << std::endl;
     for (int i = 0; i < def.NETS.size(); i++) {

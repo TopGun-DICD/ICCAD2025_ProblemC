@@ -48,6 +48,7 @@ namespace verilog {
                                     libertyOuts;
         struct {
             def::COMPONENTS_class  *component  = nullptr;
+            def::PINS_class        *pin        = nullptr;
             std::vector<int>        dx,                 // по входам - по числу входов - расстояние до предыдущего компонента по X
                                     dy;                 // по входам - по числу входов - расстояние до предыдущего компонента по Y
             int                     sum = 0,            // по входам - суммарное расстояние dx + dy по всем входам
@@ -73,6 +74,7 @@ namespace verilog {
     public:
         Net* getNetByName(const std::string &name);
         Port* getPortByName(const std::string &name);
+        Port* getPortByDEFName(const std::string &name);
         Instance* getInstanceByName(const std::string &name);
         Instance* getInstanceByDEFName(const std::string &name);
         std::vector<Instance *>

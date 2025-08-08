@@ -53,11 +53,24 @@ bool verilog::VerilogReader::read(const std::string &_fname, Netlist &_netlist, 
     return true;
 }
 
-void verilog::VerilogReader::postProcessAfterDEF() {
+void verilog::VerilogReader::postProcessAfterDEF(def::DEF_File &def) {
     for (Module *module : netlist->library)
         for (Instance *instance : module->instances)
             instance->recalcPlacementParameters();
 
+    // Create dummy instances for external pins
+    for (def::PINS_class *pin : def.PINS) {
+        if (pin->DIRECTION == def::DIRECTION_class::INPUT) {
+            Instance* temp = new Instance;
+            netlist->top->instances.push_back(temp);
+
+            //verilog::Net* outNet = new verilog::Net;
+            verilog::Net* outNet = netlist->top->getPortByDEFName(pin->pinName);
+            outNet->driver = temp;
+            temp->outs.push_back(outNet);
+            temp->placement.pin = pin;
+        }
+    }
 }
 
 bool verilog::VerilogReader::readHDLCode(const std::string &fname) {
@@ -554,12 +567,13 @@ bool verilog::VerilogReader::postProcess() {
                 net->driver = instance;
             }
         }
-        if (module == netlist->top)
-            continue;
+        //if (module == netlist->top)
+        //    continue;
         for (Port *port : module->ports) {
             if (port->direction == verilog::PortDirection::undefined) {
-                std::cerr << "    __err__ : found port (" << module->name << "." << port->name << ") with undefined direction. Abort.\n";
-                return false;
+                //std::cerr << "    __err__ : found port (" << module->name << "." << port->name << ") with undefined direction. Abort.\n";
+                //return false;
+                port->direction = verilog::PortDirection::input;
             }
         }
     }
