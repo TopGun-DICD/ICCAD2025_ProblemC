@@ -63,6 +63,7 @@ void verilog::VerilogReader::postProcessAfterDEF(def::DEF_File &def) {
         // inputs
         if (pin->DIRECTION == def::DIRECTION_class::INPUT) {
             Instance* temp = new Instance;
+            temp->name = "in_" + pin->pinName;
             netlist->top->instances.push_back(temp);
 
             verilog::Net* outNet = netlist->top->getPortByDEFName(pin->pinName);
@@ -73,6 +74,7 @@ void verilog::VerilogReader::postProcessAfterDEF(def::DEF_File &def) {
         // outputs
         if (pin->DIRECTION == def::DIRECTION_class::OUTPUT) {
             Instance* temp = new Instance;
+            temp->name = "out_" + pin->pinName;
             netlist->top->instances.push_back(temp);
 
             verilog::Net* inNet = netlist->top->getPortByDEFName(pin->pinName);

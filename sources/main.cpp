@@ -82,12 +82,16 @@ int main(int argc, char* argv[]) {
     // Process the data...
     Algorithm algorithm(netlist, lef, def,liberty);
 
-    //*
+    /*
     std::cout << "Algoritm : performing step 3...\n";
     timeStart = std::clock();
     algorithm.step_3_OptimizeFanout();
     timeStop = std::clock() - timeStart;
     std::cout << "Step 3 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
+    //*/
+
+    //*
+    std::cout << "Algorithm : total wire length before: " << algorithm.calcTotalWirelength() << std::endl;
     //*/
 
     //*
@@ -104,6 +108,10 @@ int main(int argc, char* argv[]) {
     algorithm.step_2_MoveCells();
     timeStop = std::clock() - timeStart;
     std::cout << "Step 2 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
+    //*/
+
+    //*
+    std::cout << "Algorithm : total wire length after: " << algorithm.calcTotalWirelength() << std::endl;
     //*/
 
 	//*

@@ -38,3 +38,36 @@ void Algorithm::swap_cells(def::DEF_File& def, def::COMPONENTS_class* cell1, def
     *cell2 = tempCell;
 }
 
+uint64_t Algorithm::calcTotalWirelength(bool withIOPads) {
+    uint64_t totalLength = 0;
+    for (verilog::Instance * instance : netlist.top->instances) {
+        // ≈сли это внешний пин и мы хотим считать длину включа€ рассто€ние до пинов и это выходной пин
+        if (!instance->instanceOf && (withIOPads && !instance->ins.empty())) {
+            for (verilog::Net *net : instance->ins) {
+                if (net->driver->placement.pin) {
+                    if (withIOPads)
+                        totalLength +=  abs(instance->placement.pin->POS.x - net->driver->placement.pin->POS.x) +
+                                        abs(instance->placement.pin->POS.y - net->driver->placement.pin->POS.y);
+                }
+                else {
+                    totalLength +=  abs(instance->placement.pin->POS.x - net->driver->placement.component->POS.x) +
+                                    abs(instance->placement.pin->POS.y - net->driver->placement.component->POS.y);
+                }
+            }
+        }
+        else {
+            for (verilog::Net *net : instance->ins) {
+                if (net->driver->placement.pin) {
+                    if (withIOPads)
+                        totalLength +=  abs(instance->placement.component->POS.x - net->driver->placement.pin->POS.x) +
+                                        abs(instance->placement.component->POS.y - net->driver->placement.pin->POS.y);
+                }
+                else {
+                    totalLength +=  abs(instance->placement.component->POS.x - net->driver->placement.component->POS.x) +
+                                    abs(instance->placement.component->POS.y - net->driver->placement.component->POS.y);
+                }
+            }
+        }
+    }
+    return totalLength;
+}

@@ -27,4 +27,6 @@ public:
 private:
     void swap_cells(def::DEF_File &def, const std::string &name1, const std::string &name2);
     void swap_cells(def::DEF_File& def, def::COMPONENTS_class *cell1, def::COMPONENTS_class *cell2);
+public: // Service functions
+    uint64_t    calcTotalWirelength(bool withIOPads = true);
 };
