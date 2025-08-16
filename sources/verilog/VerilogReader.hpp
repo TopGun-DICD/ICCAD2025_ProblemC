@@ -20,7 +20,7 @@ namespace verilog {
        ~VerilogReader();
     public:
         bool read(const std::string &_fname, Netlist &_netlist, lef::LEFData &_lef);
-        void postProcessAfterDEF();
+        void postProcessAfterDEF(def::DEF_File &def);
     private:
         bool readHDLCode(const std::string &_fname);
         void readToken(char *_token);

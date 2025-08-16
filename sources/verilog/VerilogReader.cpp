@@ -22,6 +22,7 @@ bool verilog::VerilogReader::read(const std::string &_fname, Netlist &_netlist, 
     netlist = &_netlist;
     lef = &_lef;
 
+   // std::cout << "codeLength " << codeLength << std::endl;
     char token[MAX_TOKEN_LENGTH];
     while (posInCode < codeLength) {
         readToken(token);
@@ -52,15 +53,40 @@ bool verilog::VerilogReader::read(const std::string &_fname, Netlist &_netlist, 
     return true;
 }
 
-void verilog::VerilogReader::postProcessAfterDEF() {
+void verilog::VerilogReader::postProcessAfterDEF(def::DEF_File &def) {
     for (Module *module : netlist->library)
         for (Instance *instance : module->instances)
             instance->recalcPlacementParameters();
 
+    // Create dummy instances for external input pins
+    for (def::PINS_class* pin : def.PINS) {
+        // inputs
+        if (pin->DIRECTION == def::DIRECTION_class::INPUT) {
+            Instance* temp = new Instance;
+            temp->name = "in_" + pin->pinName;
+            netlist->top->instances.push_back(temp);
+
+            verilog::Net* outNet = netlist->top->getPortByDEFName(pin->pinName);
+            outNet->driver = temp;
+            temp->outs.push_back(outNet);
+            temp->placement.pin = pin;
+        }
+        // outputs
+        if (pin->DIRECTION == def::DIRECTION_class::OUTPUT) {
+            Instance* temp = new Instance;
+            temp->name = "out_" + pin->pinName;
+            netlist->top->instances.push_back(temp);
+
+            verilog::Net* inNet = netlist->top->getPortByDEFName(pin->pinName);
+            inNet->sourceFor.push_back(temp);
+            temp->ins.push_back(inNet);
+            temp->placement.pin = pin;
+        }
+    }
 }
 
 bool verilog::VerilogReader::readHDLCode(const std::string &fname) {
-    std::ifstream in(fname, std::ios::in);
+    std::ifstream in(fname, std::ios::in | std::ios::binary);
     if (!in.is_open())
         return false;
 
@@ -85,6 +111,10 @@ token_start:
         return;
     while (hdlCode[posInCode] == ' ' || hdlCode[posInCode] == '\t')
         ++posInCode;
+    if (hdlCode[posInCode] == '\r') {
+        ++posInCode;
+        goto token_start;
+    }
     if (hdlCode[posInCode] == '\n') {
         ++posInCode;
         ++line;
@@ -137,6 +167,8 @@ token_start:
             ++posInCode;
             ++line;
             token[i] = '\0';
+            if (token[i - 1] == '\r')
+                token[i - 1] = '\0';
             return;
         }
         token[i++] = hdlCode[posInCode++];
@@ -311,23 +343,33 @@ bool verilog::VerilogReader::readModuleNetsOfType(Module *module, NetType type) 
         }
 
         if (!module->nets.empty()) {
-            for (index = 0; index < module->nets.size(); ++index) {
-                if (module->nets[index]->name == token)
-                    break;
-            }
-            if (index != module->nets.size()) {
-                if (module->nets[index]->type != NetType::undefined)
+            //for (index = 0; index < module->nets.size(); ++index) {
+            //    if (module->nets[index]->name == token)
+            //        break;
+            //}
+            auto it = module->nets.find(token);
+
+            if (it != module->nets.end()) {
+                if (it->second->type != NetType::undefined)
                     std::cerr << "  __wrn__ (" << line << "): in module '" << module->name << "' net '" << token << "' already has git its type"
-                    << std::endl;
-                module->nets[index]->type = type;
+                              << std::endl;
+                it->second->type = type;
                 continue;
             }
+
+            //if (index != module->nets.size()) {
+            //    if (module->nets[index]->type != NetType::undefined)
+            //        std::cerr << "  __wrn__ (" << line << "): in module '" << module->name << "' net '" << token << "' already has git its type"
+            //        << std::endl;
+            //    module->nets[index]->type = type;
+            //    continue;
+            //}
         }
         Net *net    = new Net;
-        module->nets.push_back(net);
-        //net->owner  = module;
         net->name   = token;
         net->type   = type;
+        //module->nets.push_back(net);
+        module->nets[net->name] = net;
     }
     return true;
 }
@@ -408,13 +450,15 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
     // родительского модуля
     for (size_t i = 0; i < wires.size(); ++i) {
         // Сначала найдём цепь по имени подключаемого пина
-        size_t netIndex = 0;
-        for (netIndex = 0; netIndex < _module->nets.size(); ++netIndex)
-            if (_module->nets[netIndex]->name == wires[i])
-                break;
+        //size_t netIndex = 0;
+        //for (netIndex = 0; netIndex < _module->nets.size(); ++netIndex)
+        //    if (_module->nets[netIndex]->name == wires[i])
+        //        break;
+
+        auto it = _module->nets.find(wires[i]);
 
         // Цепь нашлась
-        if (netIndex < _module->nets.size())
+        if (it != _module->nets.end())
             // Задано ли ассоциативное назначение портов?
             // Если да
             if (!pins.empty()) {
@@ -424,11 +468,11 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
                         continue;
                     switch (port->direction) {
                         case PortDirection::input:
-                            instance->ins.push_back(_module->nets[netIndex]);
+                            instance->ins.push_back(it->second);
                             break;
                         case PortDirection::output:
                         case PortDirection::inout:
-                            instance->outs.push_back(_module->nets[netIndex]);
+                            instance->outs.push_back(it->second);
                             break;
                         default:
                             ; //TODO: std::cerr
@@ -439,11 +483,11 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
             else {
                 switch (instance->instanceOf->ports[i]->direction) {
                     case PortDirection::input:
-                        instance->ins.push_back(_module->nets[netIndex]);
+                        instance->ins.push_back(it->second);
                         break;
                     case PortDirection::output:
                     case PortDirection::inout:
-                        instance->outs.push_back(_module->nets[netIndex]);
+                        instance->outs.push_back(it->second);
                         break;
                     default:
                         ; //TODO: std::cerr
@@ -452,6 +496,7 @@ bool verilog::VerilogReader::readModuleInstance(Module *_module, const char *_mo
 
         // Цепь не нашлась. Может это порт?
         else {
+            size_t netIndex = 0;
             for (netIndex = 0; netIndex < _module->ports.size(); ++netIndex)
                 if (_module->ports[netIndex]->name == wires[i])
                     break;
@@ -547,12 +592,13 @@ bool verilog::VerilogReader::postProcess() {
                 net->driver = instance;
             }
         }
-        if (module == netlist->top)
-            continue;
+        //if (module == netlist->top)
+        //    continue;
         for (Port *port : module->ports) {
             if (port->direction == verilog::PortDirection::undefined) {
-                std::cerr << "    __err__ : found port (" << module->name << "." << port->name << ") with undefined direction. Abort.\n";
-                return false;
+                //std::cerr << "    __err__ : found port (" << module->name << "." << port->name << ") with undefined direction. Abort.\n";
+                //return false;
+                port->direction = verilog::PortDirection::input;
             }
         }
     }

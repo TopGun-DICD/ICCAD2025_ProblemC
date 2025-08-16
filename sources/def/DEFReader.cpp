@@ -4,7 +4,8 @@
 
 #include "NoBoostSplit.hpp"
 
-bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, verilog::Netlist &netlist) {
+bool def::DEFReader::ReadDEF(const std::string& nameInFile, def::DEF_File& def, verilog::Netlist& netlist) {
+    //
     std::string buffer;
     std::vector<std::string> split_buffer;
     std::string BUS_DIV;
@@ -55,6 +56,7 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, 
             if (split_buffer.front() == "COMPONENTS") {
                 def.COUNT_COMPONENTS = stoi(split_buffer[1]);
                 parseComponents(&inFile, def, &i, netlist);
+                //
 
                 flagPaternov = 1;
             }
@@ -95,7 +97,7 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, 
                 ifter = split_buffer[0];
             }
 
-            if ((flagPaternov == 0) && (split_buffer[0] != "#")) {
+            if ((flagPaternov == 0) && (split_buffer[0] != "#") && (buffer != "###############################################################")) {
 
                 if (!buffer.empty()) {
                     def.beginning.push_back(buffer);
@@ -111,6 +113,8 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, 
             flagPaternov = 0;
 
         }
+
+
     }
     inFile.close();
     return true;
@@ -118,7 +122,8 @@ bool def::DEFReader::ReadDEF(const std::string &nameInFile, def::DEF_File &def, 
 
 
 
-void def::DEFReader::parseComponents(std::ifstream* inFile, DEF_File& def, int* i, verilog::Netlist &netlist) {
+void def::DEFReader::parseComponents(std::ifstream* inFile, DEF_File& def, int* i, verilog::Netlist& netlist) {
+    //
     std::string buffer;
     std::vector<std::string> split_buffer;
 
@@ -137,12 +142,12 @@ void def::DEFReader::parseComponents(std::ifstream* inFile, DEF_File& def, int* 
             }
 
             def.push_back_COMPONENTS(split_buffer[1], split_buffer[2]);
-            
-            verilog::Instance *instance = netlist.top->getInstanceByName(split_buffer[1]);
+            //*
+            verilog::Instance* instance = netlist.top->getInstanceByName(split_buffer[1]);
             if (!instance)
                 instance = netlist.top->getInstanceByDEFName(split_buffer[1]);
             instance->placement.component = def.COMPONENTS.back();
-
+            // */
             for (const auto& word : split_buffer) {
                 if (word == "PLACED") {
                     def.COMPONENTS.back()->FIXED = def::FIXED_class::PLACED;
@@ -290,7 +295,6 @@ void def::DEFReader::parseNets(std::ifstream* inFile, DEF_File& def, int* i) {
     }
 
 }
-
 void def::DEFReader::parseSpecialnets(std::ifstream* inFile, DEF_File& def, int* i) {
     std::string buffer;
     std::vector<std::string> split_buffer;
@@ -511,7 +515,7 @@ void def::DEFReader::parsePROPERTYDEFINITIONS(std::ifstream* inFile, DEF_File& d
 
     while (getline(*inFile, buffer)) {
         *i = *i + 1;
-        
+
         if (!buffer.empty()) {
             my_boost::trim(buffer);
             my_boost::split(split_buffer, buffer, my_boost::is_any_of<char>(" "), true);
@@ -519,13 +523,8 @@ void def::DEFReader::parsePROPERTYDEFINITIONS(std::ifstream* inFile, DEF_File& d
                 //cout << "END VIAS " << *i << endl;         
                 return;
             }
-                 //   def.PRO.push_back(buffer);
-        
+            def.PROPERTYDEFINITIONS.push_back(buffer);
         }
-        
-       
-        def.beginning.push_back(buffer);
-        
 
         split_buffer.clear();
     }
@@ -592,4 +591,3 @@ void swup_comp(DEF_File* def, std::string name1, std::string name2) {
 
 }
 //*/
-
