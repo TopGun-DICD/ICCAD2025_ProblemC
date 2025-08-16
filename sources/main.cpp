@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
     timeStop = std::clock() - timeStart;
     std::cout << "Step 3 completed in " << printTimeStatistics(timeStart, timeStop) << "\n\n";
 
-    /*
+    //*
     std::cout << "Writing the result to '" << cmdLine.outFile << "'...\n";
     timeStart = std::clock();
     def::DEFWriter defWriter;

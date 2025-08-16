@@ -14,4 +14,5 @@ bin/*.pdb
 bin/*.exe
 
 # tests
+bin/tests/aes_cipher_top/aes_cipher_top_result.def
 bin/tests/ASAP7/LIB

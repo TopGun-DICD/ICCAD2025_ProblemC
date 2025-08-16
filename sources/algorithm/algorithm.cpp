@@ -19,8 +19,8 @@ void Algorithm::step_3_OptimizeFanout() {
     WireLengthAnalyzer wireAnalyzerAfter(netlist, def);
     wireAnalyzerAfter.compareWireLengths(originalLengths);
 
-    def::DEFWriter writer;
-    writer.OutDEF("output2.def", def, cellReplacer.getReplacements());
+    //def::DEFWriter writer;
+    //writer.OutDEF("output2.def", def, cellReplacer.getReplacements());
 }
 
 void Algorithm::swap_cells(def::DEF_File& def, const std::string& name1, const std::string& name2) {
