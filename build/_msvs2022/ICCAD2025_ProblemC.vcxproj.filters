@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\sources\algorithm\algorithm.cpp" />
+    <ClCompile Include="..\..\sources\algorithm\CellReplacer.cpp" />
+    <ClCompile Include="..\..\sources\algorithm\FanoutAnalyzer.cpp" />
+    <ClCompile Include="..\..\sources\cmdline.cpp" />
+    <ClCompile Include="..\..\sources\def\DEFReader.cpp" />
+    <ClCompile Include="..\..\sources\def\DEFWriter.cpp" />
+    <ClCompile Include="..\..\sources\lef\LEF.cpp" />
+    <ClCompile Include="..\..\sources\lef\LEF_READER.cpp" />
+    <ClCompile Include="..\..\sources\liberty\Liberty.cpp" />
+    <ClCompile Include="..\..\sources\liberty\LibertyReader.cpp" />
+    <ClCompile Include="..\..\sources\main.cpp" />
+    <ClCompile Include="..\..\sources\verilog\Verilog.cpp" />
+    <ClCompile Include="..\..\sources\verilog\VerilogReader.cpp" />
+    <ClCompile Include="..\..\sources\algorithm\WireLengthAnalyzer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\sources\algorithm\algorithm.hpp" />
+    <ClInclude Include="..\..\sources\algorithm\CellReplacer.hpp" />
+    <ClInclude Include="..\..\sources\algorithm\FanoutAnalyzer.hpp" />
+    <ClInclude Include="..\..\sources\cmdline.hpp" />
+    <ClInclude Include="..\..\sources\def\DEF.hpp" />
+    <ClInclude Include="..\..\sources\def\DEFReader.hpp" />
+    <ClInclude Include="..\..\sources\def\DEFWriter.hpp" />
+    <ClInclude Include="..\..\sources\def\NoBoostSplit.hpp" />
+    <ClInclude Include="..\..\sources\lef\LEF.hpp" />
+    <ClInclude Include="..\..\sources\lef\LEF_READER.hpp" />
+    <ClInclude Include="..\..\sources\liberty\Liberty.hpp" />
+    <ClInclude Include="..\..\sources\liberty\LibertyReader.hpp" />
+    <ClInclude Include="..\..\sources\verilog\Verilog.hpp" />
+    <ClInclude Include="..\..\sources\verilog\VerilogReader.hpp" />
+    <ClInclude Include="..\..\sources\algorithm\WireLengthAnalyzer.hpp" />
+  </ItemGroup>
+</Project>

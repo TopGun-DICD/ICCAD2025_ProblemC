@@ -1,8 +1,7 @@
 #include "WireLengthAnalyzer.hpp"
 #include <iostream>
 
-WireLengthAnalyzer::WireLengthAnalyzer(const verilog::Netlist& netlist, const def::DEF_File& def)
-    : netlist(netlist), def(def) {
+WireLengthAnalyzer::WireLengthAnalyzer(const verilog::Netlist& netlist, const def::DEF_File& def) : netlist(netlist), def(def) {
     for (const auto* instance : netlist.top->instances) {
         instanceWireLengths[instance->name] = calculateInstanceWireLength(instance);
     }
@@ -24,10 +23,10 @@ void WireLengthAnalyzer::compareWireLengths(const std::unordered_map<std::string
     double totalOriginal = 0.0;
     double totalCurrent = 0.0;
 
-    /*
+    
     std::cout << "Wire length changes after cell replacement:\n";
     std::cout << "------------------------------------------\n";
-    */
+    
 
     for (const auto& [name, currentLength] : instanceWireLengths) {
         auto it = originalLengths.find(name);
@@ -35,19 +34,19 @@ void WireLengthAnalyzer::compareWireLengths(const std::unordered_map<std::string
             double originalLength = it->second;
             double delta = currentLength - originalLength;
 
-            //std::cout << "Instance: " << name << " | Original length: " << originalLength<< " | New length: " << currentLength<< " | Delta: " << delta << "\n";
+            std::cout << "Instance: " << name << " | Original length: " << originalLength<< " | New length: " << currentLength<< " | Delta: " << delta << "\n";
 
             totalOriginal += originalLength;
             totalCurrent += currentLength;
         }
     }
 
-    /*
+    
     std::cout << "------------------------------------------\n";
     std::cout << "Total original wire length: " << totalOriginal << "\n";
     std::cout << "Total new wire length: " << totalCurrent << "\n";
     std::cout << "Total change: " << (totalCurrent - totalOriginal) << "\n";
-    */
+    
 }
 
 double WireLengthAnalyzer::calculateInstanceWireLength(const verilog::Instance* instance) const {

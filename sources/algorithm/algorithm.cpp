@@ -20,7 +20,7 @@ void Algorithm::step_3_OptimizeFanout() {
     wireAnalyzerAfter.compareWireLengths(originalLengths);
 
     def::DEFWriter writer;
-    writer.OutDEF("output1.def", def, cellReplacer.getReplacements());
+    writer.OutDEF("output2.def", def, cellReplacer.getReplacements());
 }
 
 void Algorithm::swap_cells(def::DEF_File& def, const std::string& name1, const std::string& name2) {

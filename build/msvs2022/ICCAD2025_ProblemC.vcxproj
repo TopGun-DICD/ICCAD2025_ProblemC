@@ -24,10 +24,10 @@
     <ClCompile Include="..\..\sources\algorithm\FanoutAnalyzer.cpp" />
     <ClCompile Include="..\..\sources\algorithm\WireLengthAnalyzer.cpp" />
     <ClCompile Include="..\..\sources\cmdline.cpp" />
-    <ClCompile Include="..\..\sources\def\DEFReader.cpp" />
-    <ClCompile Include="..\..\sources\def\DEFWriter.cpp" />
     <ClCompile Include="..\..\sources\lef\LEF.cpp" />
     <ClCompile Include="..\..\sources\lef\LEF_READER.cpp" />
+    <ClCompile Include="..\..\sources\def\DEFReader.cpp" />
+    <ClCompile Include="..\..\sources\def\DEFWriter.cpp" />
     <ClCompile Include="..\..\sources\liberty\Liberty.cpp" />
     <ClCompile Include="..\..\sources\liberty\LibertyReader.cpp" />
     <ClCompile Include="..\..\sources\main.cpp" />
@@ -40,12 +40,12 @@
     <ClInclude Include="..\..\sources\algorithm\FanoutAnalyzer.hpp" />
     <ClInclude Include="..\..\sources\algorithm\WireLengthAnalyzer.hpp" />
     <ClInclude Include="..\..\sources\cmdline.hpp" />
+    <ClInclude Include="..\..\sources\lef\LEF.hpp" />
+    <ClInclude Include="..\..\sources\lef\LEF_READER.hpp" />
     <ClInclude Include="..\..\sources\def\DEF.hpp" />
     <ClInclude Include="..\..\sources\def\DEFReader.hpp" />
     <ClInclude Include="..\..\sources\def\DEFWriter.hpp" />
     <ClInclude Include="..\..\sources\def\NoBoostSplit.hpp" />
-    <ClInclude Include="..\..\sources\lef\LEF.hpp" />
-    <ClInclude Include="..\..\sources\lef\LEF_READER.hpp" />
     <ClInclude Include="..\..\sources\liberty\Liberty.hpp" />
     <ClInclude Include="..\..\sources\liberty\LibertyReader.hpp" />
     <ClInclude Include="..\..\sources\verilog\Verilog.hpp" />
