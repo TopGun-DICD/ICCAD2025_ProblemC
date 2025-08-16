@@ -78,6 +78,15 @@
     <ClCompile Include="..\..\sources\liberty\LibertyReader.cpp">
       <Filter>Source Files\liberty</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sources\algorithm\CellReplacer.cpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\algorithm\FanoutAnalyzer.cpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sources\algorithm\WireLengthAnalyzer.cpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sources\cmdline.hpp">
@@ -115,6 +124,15 @@
     </ClInclude>
     <ClInclude Include="..\..\sources\liberty\LibertyReader.hpp">
       <Filter>Header Files\liberty</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\algorithm\CellReplacer.hpp">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\algorithm\FanoutAnalyzer.hpp">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sources\algorithm\WireLengthAnalyzer.hpp">
+      <Filter>Header Files\algorithm</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
