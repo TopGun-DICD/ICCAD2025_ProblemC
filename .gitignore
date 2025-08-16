@@ -5,6 +5,7 @@ build/msvs2019/x64
 build/msvs2019/.vs
 
 # msvs2022 files
+build/_msvs2022
 build/msvs2022/ICCAD202.*
 build/msvs2022/.vs
 
