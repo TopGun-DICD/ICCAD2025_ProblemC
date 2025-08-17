@@ -25,89 +25,49 @@ void CellReplacer::replaceCellsBasedOnCapacitance(verilog::Netlist& netlist, con
 
         double originalMaxCap = getMaxOutputCapacitance(instance->libertyCell);
 
-        if (maxCapacitance > originalMaxCap) {
-            std::string bestReplacement;
-            double bestCap = originalMaxCap;
-            std::pair<double, double> bestSize;
+        if (maxCapacitance <= originalMaxCap) continue;
 
-            for (const auto& variant : variants) {
-                if (variant == originalCell) continue;
+        std::string bestReplacement;
+        double bestCap = originalMaxCap;
+        std::pair<double, double> bestSize;
 
-                liberty::Cell* variantCell = findLibertyCell(liberty, variant);
-                if (!variantCell) continue;
+        for (const auto& variant : variants) {
+            if (variant == originalCell) continue;
 
-                double variantCap = getMaxOutputCapacitance(variantCell);
-                auto variantSize = lefData.getScaledMacroSize(variant);
+            liberty::Cell* variantCell = findLibertyCell(liberty, variant);
+            if (!variantCell) continue;
 
-                if (variantCap >= maxCapacitance) {
-                    if (bestReplacement.empty() || variantCap < bestCap) {
-                        bestReplacement = variant;
-                        bestCap = variantCap;
-                        bestSize = variantSize;
-                    }
-                }
-            }
+            double variantCap = getMaxOutputCapacitance(variantCell);
+            auto variantSize = lefData.getScaledMacroSize(variant);
 
-            if (bestReplacement.empty()) {
-                auto currentRowIt = std::find_if(rows.begin(), rows.end(), [defComponent](const RowInfo& r) { return r.y == defComponent->POS.y; });
-                if (currentRowIt != rows.end()) {
-                    RowInfo rowCopy = *currentRowIt;
-                    if (canPlaceInRow(rowCopy, defComponent, bestSize)) {
-                        replacements.emplace_back(
-                            defComponent->compName,
-                            originalCell,
-                            bestReplacement,
-                            defComponent->POS.x,
-                            defComponent->POS.y,
-                            def::DEFWriter::Orientation_transform(defComponent->POS.orientation)
-                        );
-                        defComponent->modelName = bestReplacement;
-                        updateDEFComponent(defFile, defComponent, originalCell, bestReplacement, maxCapacitance);
-                    }
-                }
-            }
-        }
-
-        else if (maxCapacitance < originalMaxCap) {
-
-            std::string bestReplacement;
-            double bestCap = 0.0;
-            std::pair<double, double> bestSize;
-
-            for (const auto& variant : variants) {
-                if (variant == originalCell) continue;
-
-                liberty::Cell* variantCell = findLibertyCell(liberty, variant);
-                if (!variantCell) continue;
-
-                double variantCap = getMaxOutputCapacitance(variantCell);
-                auto variantSize = lefData.getScaledMacroSize(variant);
-
-                if (variantCap <= maxCapacitance && variantCap > bestCap) {
+            if (variantCap >= maxCapacitance) {
+                if (bestReplacement.empty() || variantCap < bestCap) {
                     bestReplacement = variant;
                     bestCap = variantCap;
                     bestSize = variantSize;
                 }
             }
+        }
 
-            if (!bestReplacement.empty()) {
-                auto currentRowIt = std::find_if(rows.begin(), rows.end(), [defComponent](const RowInfo& r) { return r.y == defComponent->POS.y; });
-                if (currentRowIt != rows.end()) {
-                    RowInfo rowCopy = *currentRowIt;
-                    if (canPlaceInRow(rowCopy, defComponent, bestSize)) {
-                        replacements.emplace_back(
-                            defComponent->compName,
-                            originalCell,
-                            bestReplacement,
-                            defComponent->POS.x,
-                            defComponent->POS.y,
-                            def::DEFWriter::Orientation_transform(defComponent->POS.orientation)
-                        );
+        if (bestReplacement.empty()) {
+            continue;
+        }
 
-                        defComponent->modelName = bestReplacement;
-                        updateDEFComponent(defFile, defComponent, originalCell, bestReplacement, maxCapacitance);
-                    }
-                }
+        auto currentRowIt = std::find_if(rows.begin(), rows.end(), [defComponent](const RowInfo& r) { return r.y == defComponent->POS.y; });
+        if (currentRowIt != rows.end()) {
+            RowInfo rowCopy = *currentRowIt;
+            if (canPlaceInRow(rowCopy, defComponent, bestSize)) {
+                replacements.emplace_back(
+                    defComponent->compName,
+                    originalCell,
+                    bestReplacement,
+                    defComponent->POS.x,
+                    defComponent->POS.y,
+                    def::DEFWriter::Orientation_transform(defComponent->POS.orientation)
+                );
+
+                defComponent->modelName = bestReplacement;
+                updateDEFComponent(defFile, defComponent, originalCell, bestReplacement, maxCapacitance);
             }
         }
     }
