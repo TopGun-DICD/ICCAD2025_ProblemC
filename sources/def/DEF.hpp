@@ -188,10 +188,11 @@ public:
     float version;
     char DIVIDERCHAR = '/';  //символ разделитель по умолчанию /
     std::string DESIGN;
-   // std::vector<std::string> PRO; //раскоменчивание все ломает
+    std::vector<std::string> PROPERTYDEFINITIONS; //раскоменчивание все ломает
 
     int UNITS_DISTANCE_MICRONS = 0;
     Rect DIEAREA;
+    std::vector<std::string> hair;// Шапка
     std::vector<std::string> beginning;// мусор в начале, не парсим
 
     int COUNT_COMPONENTS = 0;
@@ -307,4 +308,3 @@ public:
 };
 
 }
-

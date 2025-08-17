@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "../def/DEF.hpp"
 #include "../liberty/Liberty.hpp"
@@ -48,6 +49,7 @@ namespace verilog {
                                     libertyOuts;
         struct {
             def::COMPONENTS_class  *component  = nullptr;
+            def::PINS_class        *pin        = nullptr;
             std::vector<int>        dx,                 // по входам - по числу входов - расстояние до предыдущего компонента по X
                                     dy;                 // по входам - по числу входов - расстояние до предыдущего компонента по Y
             int                     sum = 0,            // по входам - суммарное расстояние dx + dy по всем входам
@@ -64,7 +66,8 @@ namespace verilog {
 
     struct Module {
         std::string             name;
-        std::vector<Net *>      nets;
+        //std::vector<Net *>      nets;
+        std::unordered_map<std::string, Net *>  nets;
         std::vector<Port *>     ports;
         std::vector<Instance *> instances;
         uint32_t                numberOfMyInstances = 0;
@@ -73,6 +76,7 @@ namespace verilog {
     public:
         Net* getNetByName(const std::string &name);
         Port* getPortByName(const std::string &name);
+        Port* getPortByDEFName(const std::string &name);
         Instance* getInstanceByName(const std::string &name);
         Instance* getInstanceByDEFName(const std::string &name);
         std::vector<Instance *>

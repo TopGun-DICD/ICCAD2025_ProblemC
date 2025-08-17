@@ -22,6 +22,7 @@
     <ClCompile Include="..\..\sources\algorithm\algorithm.cpp" />
     <ClCompile Include="..\..\sources\algorithm\CellReplacer.cpp" />
     <ClCompile Include="..\..\sources\algorithm\FanoutAnalyzer.cpp" />
+    <ClCompile Include="..\..\sources\algorithm\step_1_SwapCells.cpp" />
     <ClCompile Include="..\..\sources\algorithm\WireLengthAnalyzer.cpp" />
     <ClCompile Include="..\..\sources\cmdline.cpp" />
     <ClCompile Include="..\..\sources\lef\LEF.cpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="..\..\sources\algorithm\algorithm.hpp" />
     <ClInclude Include="..\..\sources\algorithm\CellReplacer.hpp" />
     <ClInclude Include="..\..\sources\algorithm\FanoutAnalyzer.hpp" />
+    <ClInclude Include="..\..\sources\algorithm\step_1_SwapCells.hpp" />
     <ClInclude Include="..\..\sources\algorithm\WireLengthAnalyzer.hpp" />
     <ClInclude Include="..\..\sources\cmdline.hpp" />
     <ClInclude Include="..\..\sources\lef\LEF.hpp" />
