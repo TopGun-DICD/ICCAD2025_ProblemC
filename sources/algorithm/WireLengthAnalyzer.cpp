@@ -24,8 +24,8 @@ void WireLengthAnalyzer::compareWireLengths(const std::unordered_map<std::string
     double totalCurrent = 0.0;
 
     
-    std::cout << "Wire length changes after cell replacement:\n";
-    std::cout << "------------------------------------------\n";
+    //std::cout << "Wire length changes after cell replacement:\n";
+    //std::cout << "------------------------------------------\n";
     
 
     for (const auto& [name, currentLength] : instanceWireLengths) {
@@ -34,7 +34,7 @@ void WireLengthAnalyzer::compareWireLengths(const std::unordered_map<std::string
             double originalLength = it->second;
             double delta = currentLength - originalLength;
 
-            std::cout << "Instance: " << name << " | Original length: " << originalLength<< " | New length: " << currentLength<< " | Delta: " << delta << "\n";
+            //std::cout << "Instance: " << name << " | Original length: " << originalLength<< " | New length: " << currentLength<< " | Delta: " << delta << "\n";
 
             totalOriginal += originalLength;
             totalCurrent += currentLength;
@@ -42,10 +42,10 @@ void WireLengthAnalyzer::compareWireLengths(const std::unordered_map<std::string
     }
 
     
-    std::cout << "------------------------------------------\n";
-    std::cout << "Total original wire length: " << totalOriginal << "\n";
-    std::cout << "Total new wire length: " << totalCurrent << "\n";
-    std::cout << "Total change: " << (totalCurrent - totalOriginal) << "\n";
+    //std::cout << "------------------------------------------\n";
+    //std::cout << "Total original wire length: " << totalOriginal << "\n";
+    //std::cout << "Total new wire length: " << totalCurrent << "\n";
+    //std::cout << "Total change: " << (totalCurrent - totalOriginal) << "\n";
     
 }
 

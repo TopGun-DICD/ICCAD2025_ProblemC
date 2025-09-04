@@ -44,9 +44,16 @@ private:
         std::vector<def::COMPONENTS_class*> components;
     };
     std::vector<RowInfo> analyzeRows(def::DEF_File& defFile);
-    bool canPlaceInRow(RowInfo& row, def::COMPONENTS_class* comp, const std::pair<double, double>& newSize);
+    bool canPlaceInRow(RowInfo& row, def::COMPONENTS_class* comp, const std::pair<double, double>& newSize, bool applyShift = false);
+    bool tryRedistributeInRow(RowInfo& row, size_t currentIndex, double neededSpace, bool applyShift);
+    double calculateAvailableSpaceRight(RowInfo& row, size_t currentIndex, def::COMPONENTS_class* comp);
+    double calculateAvailableSpaceLeft(RowInfo& row, size_t currentIndex, def::COMPONENTS_class* comp);
+    void distributeSpace(RowInfo& row, const std::vector<std::pair<size_t, double>>& availableSpaces, double neededSpace);
+    void shiftNeighborsRight(RowInfo& row, size_t currentIndex, double shiftAmount);
+    void shiftNeighborsLeft(RowInfo& row, size_t currentIndex, double shiftAmount);
+
     bool tryMoveToAdjacentRow(def::DEF_File& defFile, def::COMPONENTS_class* comp, const std::pair<double, double>& newSize, const std::vector<RowInfo>& rows);
     void adjustPlacementWithOrientation(def::DEF_File& defFile, def::COMPONENTS_class* component, const std::pair<double, double>& oldSize, const std::pair<double, double>& newSize);
-    const double maxRowWidth = 100.0;
+    const double maxRowWidth = 1000.0;
 
 };
